@@ -7,6 +7,7 @@ import pickle
 
 from pathlib import Path
 from typing import Literal
+from itertools import islice
 
 from config.apis_config import PM_API_SLEEP_TIME
 
@@ -34,8 +35,9 @@ For PubMed, ESearch can only retrieve the first 10,000 records matching the quer
 To obtain more than 10,000 PubMed records, consider using <EDirect> (Me: it's a CLI lol) that contains additional logic
 to batch PubMed search results automatically so that an arbitrary number can be retrieved."""
 
-    def __init__(self, api_key=None, email=None):
+    def __init__(self, database: Literal['pubmed', 'pmc'], api_key: str =None, email: str =None):
         self.base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+        self.database = database
         self.api_key = api_key
         self.email = email
         #this header is specific for POST HTTP method, consider changing it for GET method.
@@ -53,14 +55,16 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         #the hard coded limit of how much results can PubMed API return per call (10^4)
         self.hard_limit = int(1e4)
         #cache: 
-        self.pmids_cache = set()
-        self.cache_path = Path("cache/pmids_cache.pkl")
+        self.uids_cache = set()
+        self.old_cache = set()
+        self.cache_path = Path("cache/ids_cache.pkl")
         #load old pmids cache
         self._load_cache()
 
 
-    def get_pmids(self, query:str, database = 'pubmed', max_results:int = None):
-        """Add all pmids that are returned by a query to self.cache
+    def search_uids(self, query:str, max_results:int = None):
+        """Add all UIDs that are returned by a query from the specified database during class instantiation
+          to a temporary cache (self.uids_cache). 
             Params: 
                     query: a query like the one we would write in the search bar
                     database: a database supported by PubMedAPI (default = 'pubmed')
@@ -73,10 +77,9 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                                 if database = 'pubmed', the max we can get is 10,000 records. """
         
         post_data = {
-            'db': database,  
+            'db': self.database,  
             'term': query,  
-            'retmode': 'json', 
-            'usehistory': 'y'  
+            'retmode': 'json'
         }
             
         #set API key and email if used
@@ -93,10 +96,10 @@ to batch PubMed search results automatically so that an arbitrary number can be 
             response = self._send_post_request('search', post_data)
             if response:
                 ids : list = response.json()['esearchresult']['idlist']
-                self.pmids_cache.update(set(ids))
+                self.uids_cache.update(set(ids))
         
         else: #either None or greater than hard_limit
-            if database == 'pubmed':
+            if self.database == 'pubmed':
                 # Esearch can only get 10000 records from pubmed database
                 logging.warning("PubMed API: For 'pubmed' database, ESearch Endpoint is built to only retrieve the first 10,000 records matching the query. " \
                 "To get more, either specify another database or use EDirect (a CLI).")
@@ -106,7 +109,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                 response = self._send_post_request('search', post_data)
                 if response:
                     ids : list = response.json()['esearchresult']['idlist']
-                    self.pmids_cache.update(set(ids))
+                    self.uids_cache.update(set(ids))
 
             else: 
                 #if max_results is not specified, we will get everything available by setting it to count.
@@ -124,7 +127,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                     if response:
                         ids = response.json()['esearchresult']['idlist']
                         print(len(ids))
-                        self.pmids_cache.update(set(ids))
+                        self.uids_cache.update(set(ids))
 
                         # increment 'retstart' to get next 10,000 records
                         post_data['retstart'] += self.hard_limit
@@ -135,13 +138,86 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                     if response:
                         ids = response.json()['esearchresult']['idlist']
                         print(len(ids))
-                        self.pmids_cache.update(set(ids))
+                        self.uids_cache.update(set(ids))
 
+        
+
+
+
+    def fetch_new_articles(self, batch_size = 1000) -> list[dict]: 
+        """Fetch data of articles that aren't already fetched (their UIDs are present in cache).
+            Params: batch_size: the number of UIDs to send in a single HTTP POST request"""
+        data_to_post = {
+            'db' : self.database,  
+            'retmode' : 'xml',        #json is not supported by EFetch endpoint.
+        }
+        
+        #set API key and email if used
+        if self.api_key:
+            data_to_post['api_key'] = self.api_key
+        if self.email:
+            data_to_post['email'] = self.email
+
+        new_uids = self.uids_cache - self.old_cache
+        logging.info(f"PubMed API: {len(new_uids)} new UIDs articles to fetch.")
+        
+        articles = []
+        while new_uids: 
+            #iterate over the set of new UIDs
+            iterator = iter(new_uids)
+            batch = islice(iterator, batch_size)
+            #save the iterator as a list so it doesn't get consumed
+            batch = list(batch)
+            #comma-delimited UIDs
+            data_to_post['id'] = ','.join(batch)
+            xml_response = self._send_post_request('fetch', data_to_post)
+            articles.extend(self._parse_pubmed_xml(xml_response))
+            new_uids -= set(batch)
+        
         self._save_cache()
-        
+        return articles
 
 
-        
+
+
+    def _parse_pubmed_xml(self, xml_response: rq.Response):  
+        """Parse XML response of EFetch endpoint 
+        if during instantiation 'pubmed' database was specified."""
+        if xml_response: 
+            root = ET.fromstring(xml_response.text)
+            articles = [] 
+            found = root.findall('.//PubmedArticle')
+            for article in found:
+                article_title = article.find('.//ArticleTitle')
+                article_abstract = article.find('.//AbstractText')
+                article_pmid = article.find('.//PMID')
+                article_pmcid = None 
+                for article_id in article.findall('.//ArticleId'):
+                    id_type = article_id.get('IdType')
+                    if id_type == 'pmc':
+                        article_pmcid = article_id
+                        if article_pmcid is not None: break
+                
+                parsed_data = {
+                    'pmid': article_pmid.text if article_pmid is not None else None, 
+                    'pmcid': article_pmcid.text.replace("PMC", "") if article_pmcid is not None else None,
+                    'title': article_title.text if article_title is not None else None,
+                    'abstract': article_abstract.text if article_abstract is not None else None,
+                }
+
+                articles.append(parsed_data)
+            
+            return articles 
+        else: 
+            return []
+    
+
+
+
+    
+
+
+
     def _send_post_request(self, endpoint: Literal['search', 'fetch'], data_to_post: dict):
         """Send a HTTP POST request to ESearch or EFetch PubMed API endpoints.
            Params: 
@@ -184,8 +260,8 @@ to batch PubMed search results automatically so that an arbitrary number can be 
     def _load_cache(self):
         try:
             with open(self.cache_path, "rb") as f: 
-                self.pmids_cache = pickle.load(f)
-                logging.info(f"PubMed API: loaded {len(self.pmids_cache)} cached pmids.")
+                self.old_cache = pickle.load(f)
+                logging.info(f"PubMed API: loaded {len(self.old_cache)} UIDs from cache.")
 
         except FileNotFoundError:
             logging.info(f"PubMed API: no cache found, starting fresh.")
@@ -198,19 +274,20 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         self.cache_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             with open(self.cache_path, "wb") as f: 
-                pickle.dump(obj= self.pmids_cache, file= f)
-                logging.info(f"PubMed API: saved {len(self.pmids_cache)} pmids to cache.")
+                pickle.dump(obj= self.uids_cache, file= f)
+                logging.info(f"PubMed API: saved {len(self.uids_cache)} UIDs back to cache.")
 
         except Exception as e: 
-            logging.error(f"PubMed API: failed to save pmids to cache. {e}")
+            logging.error(f"PubMed API: failed to save UIDs to cache. {e}")
 
 
 
 
 if __name__ == "__main__":
-    api = NewPubMedAPI()
-    api.get_pmids("human", database="pmc", max_results=30350)
-    print(len(api.pmids_cache))
+    api = NewPubMedAPI("pubmed")
+    api.search_uids("human", max_results=40)
+    print("cache:", len(api.uids_cache))
+    api.fetch_new_articles()
 
 
 
