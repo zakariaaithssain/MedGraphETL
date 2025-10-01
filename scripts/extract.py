@@ -54,8 +54,8 @@ def _get_data_from_apis(pubmed_api: PubMedAPI,
         
         all_articles = []
 
-        if extract_abstracts_only: logging.info(f"Extraction Process: Extracting Abstracts Only. No Calls To PubMedCentral API.\n")
-        else: logging.info(f"Extraction Process: Extracting Abstracts And Body. PubMedCentral API Will Be Called For Each Article.\n")
+        if extract_abstracts_only: logging.info(f"Extraction Process: extracting abstracts only\n")
+        else: logging.info(f"Extraction Process: extracting abstracts and full content, \n")
         
         for cancer in PM_QUERIES.keys():
             logging.info(f"Extraction Process: Working On: {cancer.capitalize()} Cancer.\n")

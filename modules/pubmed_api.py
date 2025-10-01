@@ -126,7 +126,6 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                     response = self._send_post_request('search', post_data)
                     if response:
                         ids = response.json()['esearchresult']['idlist']
-                        print(len(ids))
                         self.uids_cache.update(set(ids))
 
                         # increment 'retstart' to get next 10,000 records
@@ -137,7 +136,6 @@ to batch PubMed search results automatically so that an arbitrary number can be 
                     response = self._send_post_request('search', post_data)
                     if response:
                         ids = response.json()['esearchresult']['idlist']
-                        print(len(ids))
                         self.uids_cache.update(set(ids))
 
         
@@ -145,7 +143,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 
 
     def fetch_new_articles(self, batch_size = 1000) -> list[dict]: 
-        """Fetch data of articles that aren't already fetched (their UIDs are present in cache).
+        """Fetch data of articles whose UIDs are not found in cache (meaning they aren't aleardy fetched).
             Params: batch_size: the number of UIDs to send in a single HTTP POST request"""
         data_to_post = {
             'db' : self.database,  
@@ -182,7 +180,8 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 
     def _parse_pubmed_xml(self, xml_response: rq.Response):  
         """Parse XML response of EFetch endpoint 
-        if during instantiation 'pubmed' database was specified."""
+        if during instantiation 'pubmed' database was specified.
+        NOTE: this is specific for PubMed returned XML, and doesn't work with the other databases."""
         if xml_response: 
             root = ET.fromstring(xml_response.text)
             articles = [] 
@@ -286,9 +285,9 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 if __name__ == "__main__":
     #testing example
     api = NewPubMedAPI("pubmed")
-    api.search_uids("human", max_results=40)
+    api.search_uids("human AND medline[sb] AND free full text[sb]", 20)
     print("cache:", len(api.uids_cache))
-    api.fetch_new_articles()
+    print("an article ", api.fetch_new_articles()[0])
 
 
 
