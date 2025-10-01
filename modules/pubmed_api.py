@@ -284,6 +284,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 
 
 if __name__ == "__main__":
+    #testing example
     api = NewPubMedAPI("pubmed")
     api.search_uids("human", max_results=40)
     print("cache:", len(api.uids_cache))
