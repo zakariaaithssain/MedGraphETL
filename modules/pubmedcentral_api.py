@@ -3,7 +3,63 @@ from typing import override
 
 import logging
 
-from modules.pubmed_api import PubMedAPI
+from modules.pubmed_api import PubMedAPI, NewPubMedAPI
+from config.secrets import PM_API_KEY_EMAIL
+from config.apis_config import PM_QUERIES
+
+
+
+#search_uids I guess will be the same, but the fetch_new_articles and xml_parser functions should be overriden 
+class NewPMCAPI(NewPubMedAPI):
+    def __init__(self, api_key = None, email = None):
+        super().__init__(database = 'pmc', api_key = api_key, email = email)
+
+
+
+    @override
+    def fetch_new_articles(self, batch_size=1000):
+        pass
+
+
+    @override 
+    def _parse_pubmedcentral_xml(self, xml_response):
+        pass
+    
+
+
+
+
+
+if __name__ == "__main__":
+    #testing example
+    api = NewPubMedAPI("pmc", api_key=PM_API_KEY_EMAIL["api_key"], email=PM_API_KEY_EMAIL['email'])
+    api.search_uids("human", 10)
+    print("cache:",api.uids_cache)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #PubMed Central API to get the body text of free available articles. 

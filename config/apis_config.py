@@ -6,8 +6,11 @@ PM_API_SLEEP_TIME = {"with_key" : 0.11,  #with key we have 10requests/second
 
 
 
-#the medline[sb] filter is to get data from the Medline Subset of PubMed that 
-# contains more high quality data
+#NOTE: THE FOLLOWING QUERIES CONTAIN FILTERS THAT ARE SPECIFIC FOR PUBMED DATABASE, SO THIS QUERIES 
+# WILL RETURN NOTHING IF USED WITH PUBMEDCENTRAL OR OTHER DATABASES.
+#  
+# the medline[sb] filter is to get data from the Medline Subset of PubMed that 
+# contains more high quality data, free full text filter is to get only free articles (thus available pmcid)
 PM_QUERIES = {
     
     "cancer_gene_regulation": '''
