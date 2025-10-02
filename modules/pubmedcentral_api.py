@@ -6,7 +6,7 @@ import logging
 
 from modules.pubmed_api import PubMedAPI, NewPubMedAPI
 from config.secrets import PM_API_KEY_EMAIL
-from config.apis_config import PM_QUERIES
+
 
 
 
@@ -18,15 +18,11 @@ class NewPMCAPI(NewPubMedAPI):
 
 
     @override
-    def fetch_pubmedcentral_articles(self, batch_size = 1000) -> list[dict]: 
-        """Fetch data of articles whose UIDs are given to 'ids' param.
-            Params: ids: dictionary of string pubmedcentral ids."""
-        
-        
+    def fetch_new_articles(self, batch_size=1000) -> list[dict]:
+        """Fetch PMC articles. Overrides parent method."""
         data_to_post = {
-            'db' : 'pmc',  
-            'retmode' : 'xml',        #json is not supported by EFetch endpoint.
-            'rettype' : 'full', 
+            'db': 'pmc',
+            'retmode': 'xml',
         }
 
         if self.api_key:
@@ -36,60 +32,125 @@ class NewPMCAPI(NewPubMedAPI):
 
         new_uids = self.uids_cache - self.old_cache
         logging.info(f"PubMedCentral API: {len(new_uids)} new UIDs articles to fetch.")
-        
+
         articles = []
-        while new_uids: 
-            #iterate over the set of new UIDs
+        while new_uids:
             iterator = iter(new_uids)
-            batch = islice(iterator, batch_size)
-            #save the iterator as a list so it doesn't get consumed
-            batch = list(batch)
-            #comma-delimited UIDs
+            batch = list(islice(iterator, batch_size))
             data_to_post['id'] = ','.join(batch)
+            
             xml_response = self._send_post_request('fetch', data_to_post)
-            articles.extend(self._parse_pubmedcentral_xml(xml_response))
+            articles.extend(self._parse_pmc_xml(xml_response))
             new_uids -= set(batch)
-        
+
         self._save_cache()
         return articles
 
-    @override 
-    def _parse_pubmedcentral_xml(self, xml_response):
-        """get the full textual content of an XML response returned by efetch endpoint of PubMedCentral"""
-        if xml_response: 
-            root = ET.fromstring(xml_response.text)
 
-            article_body = root.find(".//body")
-            if article_body is None:
-                return None
+    def _parse_pmc_xml(self, xml_response) -> list[dict]:
+        """Parse PMC XML and return list of article dictionaries."""
+        if not xml_response:
+            return []
 
-            paragraphs = []
-            for p in article_body.findall(".//p"):
-                if p.text: 
-                    paragraphs.append(p.text.strip())
-            
-            
-            return "\n\n".join(paragraphs)
+        root = ET.fromstring(xml_response.text)
+        articles = []
 
-        else: 
-            return None
+        # PMC uses <article> tags
+        found_articles = root.findall('.//article')
+
+        for article in found_articles:
+            # Extract IDs
+            pmcid = None
+            pmid = None
+            for article_id in article.findall('.//article-id'):
+                id_type = article_id.get('pub-id-type')
+                if id_type == 'pmc':
+                    pmcid = article_id.text
+                elif id_type == 'pmid':
+                    pmid = article_id.text
+
+            # Extract title
+            title_elem = article.find('.//article-title')
+            title = self._get_all_text(title_elem) if title_elem is not None else None
+
+            # Extract abstract
+            abstract_parts = []
+            abstract_elem = article.find('.//abstract')
+            if abstract_elem is not None:
+                for p in abstract_elem.findall('.//p'):
+                    text = self._get_all_text(p)
+                    if text:
+                        abstract_parts.append(text)
+            abstract = "\n\n".join(abstract_parts) if abstract_parts else None
+
+            # Extract full body text
+            body_parts = []
+            body_elem = article.find('.//body')
+            if body_elem is not None:
+                for p in body_elem.findall('.//p'):
+                    text = self._get_all_text(p)
+                    if text:
+                        body_parts.append(text)
+            body_text = "\n\n".join(body_parts) if body_parts else None
+
+            parsed_data = {
+                'pmid': pmid,
+                'pmcid': pmcid,
+                'title': title,
+                'abstract': abstract,
+                'body': body_text,  # Full text
+            }
+
+            articles.append(parsed_data)
+
+        return articles
+
+
+
+    def _get_all_text(self, element) -> str:
+        """Recursively extract all text from an element, including nested tags."""
+        if element is None:
+            return ""
+        
+        # Get all text content including nested elements
+        text_parts = []
+        if element.text:
+            text_parts.append(element.text)
+        
+        for child in element:
+            text_parts.append(self._get_all_text(child))
+            if child.tail:
+                text_parts.append(child.tail)
+        
+        return "".join(text_parts).strip()
     
 
 
 
 
 
+# Test
 if __name__ == "__main__":
-    #testing example
-    api = NewPMCAPI(api_key=PM_API_KEY_EMAIL["api_key"], email=PM_API_KEY_EMAIL['email'])
-    api.search_uids("human", 10)
-    print(api.fetch)
+    api = NewPMCAPI(api_key=PM_API_KEY_EMAIL["api_key"], 
+                    email=PM_API_KEY_EMAIL['email'])
+    
+    # Test with a known PMC ID
+    api.uids_cache.add("212403")
+    
+    articles = api.fetch_new_articles()
+    
+    if articles:
+        print(f"Found {len(articles)} article(s)")
+        print(f"Title: {articles[0]['title']}")
+        print(f"PMC ID: {articles[0]['pmcid']}")
+        print(f"Abstract length: {len(articles[0]['abstract']) if articles[0]['abstract'] else 0}")
+        print(f"Body length: {len(articles[0]['body']) if articles[0]['body'] else 0}")
+    else:
+        print("No articles fetched")
 
 
 
-
-
-
+####################### WILL BE DEPRECATED SOON ##############################################
 
 
 
