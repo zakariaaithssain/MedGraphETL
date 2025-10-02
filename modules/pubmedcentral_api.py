@@ -1,5 +1,6 @@
 from xml.etree import ElementTree as ET
 from typing import override
+from itertools import islice
 
 import logging
 
@@ -17,13 +18,61 @@ class NewPMCAPI(NewPubMedAPI):
 
 
     @override
-    def fetch_new_articles(self, batch_size=1000):
-        pass
+    def fetch_pubmedcentral_articles(self, batch_size = 1000) -> list[dict]: 
+        """Fetch data of articles whose UIDs are given to 'ids' param.
+            Params: ids: dictionary of string pubmedcentral ids."""
+        
+        
+        data_to_post = {
+            'db' : 'pmc',  
+            'retmode' : 'xml',        #json is not supported by EFetch endpoint.
+            'rettype' : 'full', 
+        }
 
+        if self.api_key:
+            data_to_post['api_key'] = self.api_key
+        if self.email:
+            data_to_post['email'] = self.email
+
+        new_uids = self.uids_cache - self.old_cache
+        logging.info(f"PubMedCentral API: {len(new_uids)} new UIDs articles to fetch.")
+        
+        articles = []
+        while new_uids: 
+            #iterate over the set of new UIDs
+            iterator = iter(new_uids)
+            batch = islice(iterator, batch_size)
+            #save the iterator as a list so it doesn't get consumed
+            batch = list(batch)
+            #comma-delimited UIDs
+            data_to_post['id'] = ','.join(batch)
+            xml_response = self._send_post_request('fetch', data_to_post)
+            articles.extend(self._parse_pubmedcentral_xml(xml_response))
+            new_uids -= set(batch)
+        
+        self._save_cache()
+        return articles
 
     @override 
     def _parse_pubmedcentral_xml(self, xml_response):
-        pass
+        """get the full textual content of an XML response returned by efetch endpoint of PubMedCentral"""
+        if xml_response: 
+            root = ET.fromstring(xml_response.text)
+
+            article_body = root.find(".//body")
+            if article_body is None:
+                return None
+
+            paragraphs = []
+            for p in article_body.findall(".//p"):
+                if p.text: 
+                    paragraphs.append(p.text.strip())
+            
+            
+            return "\n\n".join(paragraphs)
+
+        else: 
+            return None
     
 
 
@@ -32,9 +81,9 @@ class NewPMCAPI(NewPubMedAPI):
 
 if __name__ == "__main__":
     #testing example
-    api = NewPubMedAPI("pmc", api_key=PM_API_KEY_EMAIL["api_key"], email=PM_API_KEY_EMAIL['email'])
+    api = NewPMCAPI(api_key=PM_API_KEY_EMAIL["api_key"], email=PM_API_KEY_EMAIL['email'])
     api.search_uids("human", 10)
-    print("cache:",api.uids_cache)
+    print(api.fetch)
 
 
 

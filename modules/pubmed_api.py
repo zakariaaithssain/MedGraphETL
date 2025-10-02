@@ -57,7 +57,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         #cache: 
         self.uids_cache = set()
         self.old_cache = set()
-        self.cache_path = Path("cache/ids_cache.pkl")
+        self.cache_path = Path(f"cache/{self.database}ids_cache.pkl")
         #load old pmids cache
         self._load_cache()
 
@@ -142,15 +142,14 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 
 
 
-    def fetch_new_articles(self, batch_size = 1000) -> list[dict]: 
+    def fetch_new_pubmed_articles(self, batch_size = 1000) -> list[dict]: 
         """Fetch data of articles whose UIDs are not found in cache (meaning they aren't aleardy fetched).
             Params: batch_size: the number of UIDs to send in a single HTTP POST request"""
         data_to_post = {
             'db' : self.database,  
             'retmode' : 'xml',        #json is not supported by EFetch endpoint.
         }
-        
-        #set API key and email if used
+
         if self.api_key:
             data_to_post['api_key'] = self.api_key
         if self.email:
@@ -167,6 +166,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
             #save the iterator as a list so it doesn't get consumed
             batch = list(batch)
             #comma-delimited UIDs
+
             data_to_post['id'] = ','.join(batch)
             xml_response = self._send_post_request('fetch', data_to_post)
             articles.extend(self._parse_pubmed_xml(xml_response))
@@ -287,9 +287,8 @@ if __name__ == "__main__":
     api = NewPubMedAPI("pubmed")
     api.search_uids("human AND medline[sb] AND free full text[sb]", 20)
     print("cache:", len(api.uids_cache))
-    print("an article ", api.fetch_new_articles()[0])
-
-
+    print("an article ", api.fetch_new_pubmed_articles()[0])
+    
 
 
 
