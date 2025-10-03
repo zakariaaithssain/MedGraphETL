@@ -1,10 +1,10 @@
-2025-10-02 11:32:40,700 - INFO - Logs file initialized.
-2025-10-02 11:32:42,344 - WARNING - PubMed API: API key absent. less API rate limit allowed.
-2025-10-02 11:32:42,344 - WARNING - PubMed API: email absent.
-2025-10-02 11:32:42,345 - INFO - PubMed API: no cache found, starting fresh.
-2025-10-02 11:32:43,923 - INFO - PubMed API: search endpoint response OK: 200
-2025-10-02 11:32:43,923 - INFO - search endpoint sleeping for 0.34s.
-2025-10-02 11:32:44,283 - INFO - PubMed API: 20 new UIDs articles to fetch.
-2025-10-02 11:32:46,839 - INFO - PubMed API: fetch endpoint response OK: 200
-2025-10-02 11:32:46,839 - INFO - fetch endpoint sleeping for 0.34s.
-2025-10-02 11:32:47,196 - INFO - PubMed API: saved 20 UIDs back to cache.
+2025-10-03 16:39:29,027 - INFO - Logs file initialized.
+2025-10-03 16:39:29,335 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-10-03 16:39:29,335 - INFO - PubMed API: email used.
+2025-10-03 16:39:29,335 - INFO - PubMed API: no cache found, starting fresh.
+2025-10-03 16:39:37,804 - INFO - PubMed API: search endpoint response OK: 200
+2025-10-03 16:39:37,805 - INFO - search endpoint sleeping for 0.11s.
+2025-10-03 16:39:37,921 - INFO - PubMedCentral API: 20 new UIDs articles to fetch.
+2025-10-03 16:39:39,587 - INFO - PubMed API: fetch endpoint response OK: 200
+2025-10-03 16:39:39,587 - INFO - fetch endpoint sleeping for 0.11s.
+2025-10-03 16:39:39,765 - INFO - PubMed API: saved 20 UIDs back to cache.

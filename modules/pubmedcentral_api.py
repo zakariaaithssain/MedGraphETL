@@ -134,19 +134,10 @@ if __name__ == "__main__":
     api = NewPMCAPI(api_key=PM_API_KEY_EMAIL["api_key"], 
                     email=PM_API_KEY_EMAIL['email'])
     
-    # Test with a known PMC ID
-    api.uids_cache.add("212403")
-    
-    articles = api.fetch_new_articles()
-    
-    if articles:
-        print(f"Found {len(articles)} article(s)")
-        print(f"Title: {articles[0]['title']}")
-        print(f"PMC ID: {articles[0]['pmcid']}")
-        print(f"Abstract length: {len(articles[0]['abstract']) if articles[0]['abstract'] else 0}")
-        print(f"Body length: {len(articles[0]['body']) if articles[0]['body'] else 0}")
-    else:
-        print("No articles fetched")
+    api.search_uids(query="human", max_results= 20)
+    res = api.fetch_new_articles()
+    if res: print(res[0])
+    else: print("no articles in results.")
 
 
 
