@@ -9,14 +9,15 @@ from scripts.load import load_to_aura
 
 from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
-def extract_stage(max_results=1000, extract_abstracts_only=True):
+def extract_stage(article_content: bool = False,
+                    max_results: int = None,
+                    batch_size: int = 1000
+    ):
     """Step 1: Extract articles from PubMed to MongoDB."""
     try:
         logging.info("Starting extraction stage.")
         print("Starting extraction stage...")
-        extract_pubmed_to_mongo(
-            extract_abstracts_only=extract_abstracts_only,
-            max_results=max_results
+        extract_pubmed_to_mongo(article_content, max_results, batch_size
         )
         logging.info("Extraction stage completed.")
         print("Extraction stage completed.")
@@ -108,7 +109,10 @@ def load_stage(ents_clean_csv='data/ready_for_neo4j/entities4neo4j.csv',
 
 
 
-def run_etl(max_results=1000, extract_abstracts_only=True, load_batch_size=1000):
+def run_etl(article_content: bool = False,
+    max_results: int = None,
+    batch_size: int = 1000,
+    load_batch_size=1000):
     """Full ETL pipeline orchestrator."""
     try:
         # Step 1: Extract
@@ -116,7 +120,7 @@ def run_etl(max_results=1000, extract_abstracts_only=True, load_batch_size=1000)
         print("ETL PIPELINE STARTING")
         print("=" * 50)
         
-        if not extract_stage(max_results=max_results, extract_abstracts_only=extract_abstracts_only):
+        if not extract_stage(article_content, max_results, batch_size):
             print("ETL pipeline stopped: Extraction stage failed or was interrupted.")
             logging.error("ETL pipeline stopped: Extraction stage failed or was interrupted.")
             return False
@@ -182,22 +186,27 @@ Examples:
     parser.add_argument(
         "--max-results",
         type=int,
-        default=1000,
-        help="Maximum number of results to extract per API call (default: 1000, max: 10000)." \
-        "Note: This is not the maximum number of results to extract, which is the hardcoded API limit 10000."
+        default=None,
+        help="Maximum number of results to fetch PER QUERY. default: None (extracts all available results), max: 10000 for PubMed, No limit for the other databases." \
     )
     
     parser.add_argument(
         "--batch-size",
         type=int,
         default=1000,
+        help="Number of UIDs to POST per each API call. (default: 1000)"
+    )
+    parser.add_argument(
+        "--load-batch-size",
+        type=int,
+        default=1000,
         help="Batch size for loading nodes and relationships to Neo4j (default: 1000)"
     )
     
     parser.add_argument(
-        "--full-text",
+        "--article-content",
         action="store_true",
-        help="Extract full text instead of abstracts only"
+        help="Extract full articles contents instead of abstracts only"
     )
     
     args = parser.parse_args()
@@ -208,7 +217,8 @@ Examples:
         if args.step == "extract":
             success = extract_stage(
                 max_results=args.max_results,
-                extract_abstracts_only=not args.full_text
+                article_content=args.article_content,
+                batch_size=args.batch_size
             )
         elif args.step == "annotate":
             success = annotate_stage()
@@ -218,12 +228,13 @@ Examples:
             if success:
                 print(f"Cleaned files ready: {ents_path}, {rels_path}")
         elif args.step == "load":
-            success = load_stage(load_batch_size=args.batch_size)
+            success = load_stage(load_batch_size=args.load_batch_size)
         else:
             success = run_etl(
                 max_results=args.max_results,
-                extract_abstracts_only=not args.full_text,
-                load_batch_size=args.batch_size
+                article_content= args.full_content,
+                batch_size=args.batch_size,
+                load_batch_size=args.load_batch_size
             )
     
     except KeyboardInterrupt:
