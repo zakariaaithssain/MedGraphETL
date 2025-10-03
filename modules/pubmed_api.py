@@ -57,7 +57,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         #cache: 
         self.uids_cache = set()
         self.old_cache = set()
-        self.cache_path = Path(f"cache/{self.database}ids_cache.pkl")
+        self.cache_path = Path(f"cache/{self.database}_UIDs_cache.pkl")
         #load old pmids cache
         self._load_cache()
 
