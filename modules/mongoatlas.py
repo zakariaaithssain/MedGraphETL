@@ -48,7 +48,11 @@ class MongoAtlasConnector:
         
 
 
-    def load_articles_to_atlas(self, all_articles, abstract_only = True):
+    def load_articles_to_atlas(self, all_articles: list[dict]):
+        """Load fetched articles data to MongoDB Atlas cloud. 
+            Arguments: 
+                    all_articles = list of dictionaries, each corresponds to one article's data."""
+        
         logging.info("AtlasConnector: Inserting New Docs. Already Present Ones Will Be Ignored.")
         for article in tqdm(all_articles, desc="inserting new docs, present and empty ones are ignored"):
             try:
