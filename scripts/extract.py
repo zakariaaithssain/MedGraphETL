@@ -1,14 +1,78 @@
 """"this will contain Extraction Process functions for the project"""
 import logging 
 
+###
 from modules.pubmed_api import PubMedAPI
 from modules.pubmedcentral_api import PubMedCentralAPI
+###
+
+from modules.pubmed_api import NewPubMedAPI
+from modules.pubmedcentral_api import NewPMCAPI
 from modules.mongoatlas import MongoAtlasConnector
 
 from config.secrets import PM_API_KEY_EMAIL
 from config.apis_config import PM_QUERIES
 from config.secrets import MONGO_CONNECTION_STR
 
+
+
+#api key and email are optional, but if not provided, we have less requests rate. 
+pubmed_api = NewPubMedAPI(api_key = PM_API_KEY_EMAIL["api_key"],
+                        email = PM_API_KEY_EMAIL["email"])
+
+pubmedcentral_api = NewPMCAPI(api_key = PM_API_KEY_EMAIL["api_key"],
+                                        email = PM_API_KEY_EMAIL["email"])
+
+mongo_connector = MongoAtlasConnector(connection_str=MONGO_CONNECTION_STR)
+
+
+#less max_results, less API pression, more loop iterations
+#if max results is not specified, the default is 1k, the max is 10k
+def extract_pubmed_to_mongo(extract_abstracts_only=True, max_results=1000):
+    try: 
+        all_articles = _get_data_from_apis(pubmed_api, pubmedcentral_api,
+                                        extract_abstracts_only,
+                                            max_results) 
+        
+        mongo_connector.load_articles_to_atlas(all_articles, abstract_only = True)
+
+    except KeyboardInterrupt: 
+        logging.error("Extraction Process Interrupted Manually.")
+        raise
+
+
+
+
+def _get_data_from_apis(full_content = False,
+                        max_results = 1000,
+                        pubmed_api = pubmed_api,
+                        pubmedcentral_api = pubmedcentral_api,
+                           ): 
+        """ 
+        #arguments:
+                pubmed_api (resp. pubmedcentral_api) = PubMedAPI (resp. PubMedCentralAPI) instance 
+                extract_abstracts_only = when set to False, it extracts also articles body.
+                                        This takes time because it requires an API call per article.
+                max_results = the number of articles to get per iteration.
+                #Note = the code is designed to always get all articles available per query, so 
+                the max_results is only for specifiying how much to request from the API per iteration. 
+                Decreasing max_results increases the number of loop iterations, but inhances API performance.
+                """
+        if not full_content: 
+             logging.info("Extraction Process: extracting only articles abstracts and metadata.")
+             print("Only articles abstracts will be fetched.")
+             
+        
+
+
+
+
+
+
+
+
+
+################## THIS WILL SOON BE DEPRECATED ######################################################
 
 #api key and email are optional, but if not provided, we have less requests rate. 
 pubmed_api = PubMedAPI(api_key = PM_API_KEY_EMAIL["api_key"],

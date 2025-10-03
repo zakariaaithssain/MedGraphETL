@@ -35,7 +35,7 @@ For PubMed, ESearch can only retrieve the first 10,000 records matching the quer
 To obtain more than 10,000 PubMed records, consider using <EDirect> (Me: it's a CLI lol) that contains additional logic
 to batch PubMed search results automatically so that an arbitrary number can be retrieved."""
 
-    def __init__(self, database: Literal['pubmed', 'pmc'], api_key: str =None, email: str =None):
+    def __init__(self, database: Literal['pubmed', 'pmc'] = 'pubmed', api_key: str =None, email: str =None):
         self.base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
         self.database = database
         self.api_key = api_key
@@ -142,7 +142,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
 
 
 
-    def fetch_new_pubmed_articles(self, batch_size = 1000) -> list[dict]: 
+    def fetch_new_articles(self, batch_size = 1000) -> list[dict]: 
         """Fetch data of articles whose UIDs are not found in cache (meaning they aren't aleardy fetched).
             Params: batch_size: the number of UIDs to send in a single HTTP POST request"""
         data_to_post = {
@@ -287,7 +287,7 @@ if __name__ == "__main__":
     api = NewPubMedAPI("pubmed")
     api.search_uids("human AND medline[sb] AND free full text[sb]", 20)
     print("cache:", len(api.uids_cache))
-    print("an article ", api.fetch_new_pubmed_articles()[0])
+    print("an article ", api.fetch_new_articles()[0])
     
 
 
