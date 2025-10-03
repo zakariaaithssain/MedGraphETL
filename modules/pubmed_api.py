@@ -100,10 +100,7 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         
         else: #either None or greater than hard_limit
             if self.database == 'pubmed':
-                # Esearch can only get 10000 records from pubmed database
-                logging.warning("PubMed API: For 'pubmed' database, ESearch Endpoint is built to only retrieve the first 10,000 records matching the query. " \
-                "To get more, either specify another database or use EDirect (a CLI).")
-                print("max results for 'pubmed' database is 10,000. See logs file for more info.")
+                # Esearch can only get 10000 records from pubmed databas
                 post_data['retmax'] = self.hard_limit
 
                 response = self._send_post_request('search', post_data)

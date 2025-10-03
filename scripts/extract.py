@@ -66,6 +66,13 @@ def _get_data_from_apis(article_content = False,
             """
         logging.info("Extraction Process: searching UIDs of articles found for each query.")
         print("Searching UIDs...")
+
+        if not article_content: 
+            logging.warning("PubMed API: For 'pubmed' database, ESearch Endpoint is built to only retrieve the first 10,000 records matching the query. " \
+                "To get more, either specify another database or use EDirect (a CLI). See PubMed API documentation for more info.")
+            print("max results for 'pubmed' database is 10,000. See logs file for more info.")
+
+
         for query in PM_QUERIES:
             pubmed_api.search_uids(query=query, max_results= max_results)
         
