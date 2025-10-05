@@ -8,6 +8,7 @@ import pickle
 from pathlib import Path
 from typing import Literal
 from itertools import islice
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config.apis_config import PM_API_SLEEP_TIME
 
@@ -156,19 +157,20 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         logging.info(f"PubMed API: {len(new_uids)} new UIDs articles to fetch.")
         
         articles = []
-        while new_uids: 
-            #iterate over the set of new UIDs
-            iterator = iter(new_uids)
-            batch = islice(iterator, batch_size)
-            #save the iterator as a list so it doesn't get consumed
-            batch = list(batch)
-            #comma-delimited UIDs
+        batches = list(self._batcher(new_uids, batch_size))
+        articles = []
 
-            data_to_post['id'] = ','.join(batch)
-            xml_response = self._send_post_request('fetch', data_to_post)
-            articles.extend(self._parse_pubmed_xml(xml_response))
-            new_uids -= set(batch)
-        
+        with ThreadPoolExecutor(max_workers= 8) as executor:
+            futures = []
+            for batch in batches: 
+                data = data_to_post.copy()
+                data['id'] = ','.join(batch)
+                futures.append(executor.submit(self._combine_methods, data, batch))
+
+            for future in as_completed(futures):
+                articles.extend(future.result())
+
+
         self._save_cache()
         return articles
 
@@ -250,6 +252,24 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         
         return post_response                   
 
+
+
+    def _batcher(self, new_uids: list, batch_size: int):
+            """Create batches of size batch_size of new UIDs"""
+            iterator = iter(new_uids)
+            while True: 
+                batch = list(islice(iterator, batch_size))
+                if not batch: #meaning the iterator is consumed, which will give an empty batch
+                    break
+                yield batch
+
+
+    def _combine_methods(self, data_to_post:dict, batch:list):
+            """This is just to combine the _send_post_request and _parse_pubmed_xml 
+            (or _parse_pmc_xml for PubMedCentral class) methods in one method
+            so we could pass them to the submet method of the ThreadPoolExecutor."""
+            xml_response = self._send_post_request('fetch', data_to_post)
+            return self._parse_pubmed_xml(xml_response)
 
 
 

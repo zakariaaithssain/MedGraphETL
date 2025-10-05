@@ -132,18 +132,7 @@ class NewPMCAPI(NewPubMedAPI):
         return "".join(text_parts).strip()
     
 
-
-    def _batcher(self, new_uids: list, batch_size: int):
-        """Create batches of size batch_size of new UIDs"""
-        iterator = iter(new_uids)
-        while True: 
-            batch = list(islice(iterator, batch_size))
-            if not batch: #meaning the iterator is consumed, which will give an empty batch
-                break
-            yield batch
-
-
-
+    @override
     def _combine_methods(self, data_to_post:dict, batch:list):
         """This is just to combine the _send_post_request and _parse_pmc_xml methods in one method
         so I can pass them to the submet method of the ThreadPoolExecutor."""
