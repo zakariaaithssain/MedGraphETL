@@ -1,6 +1,7 @@
 from xml.etree import ElementTree as ET
 from typing import override
 from itertools import islice
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import logging
 
@@ -33,18 +34,24 @@ class NewPMCAPI(NewPubMedAPI):
         new_uids = self.uids_cache - self.old_cache
         logging.info(f"PubMedCentral API: {len(new_uids)} new UIDs articles to fetch.")
 
+        batches = list(self._batcher(new_uids, batch_size))
         articles = []
-        while new_uids:
-            iterator = iter(new_uids)
-            batch = list(islice(iterator, batch_size))
-            data_to_post['id'] = ','.join(batch)
-            
-            xml_response = self._send_post_request('fetch', data_to_post)
-            articles.extend(self._parse_pmc_xml(xml_response))
-            new_uids -= set(batch)
+
+        with ThreadPoolExecutor(max_workers= 8) as executor:
+            futures = []
+            for batch in batches: 
+                data = data_to_post.copy()
+                data['id'] = ','.join(batch)
+                futures.append(executor.submit(self._combine_methods, data, batch))
+
+            for future in as_completed(futures):
+                articles.extend(future.result())
+
 
         self._save_cache()
         return articles
+
+
 
 
     def _parse_pmc_xml(self, xml_response) -> list[dict]:
@@ -123,6 +130,27 @@ class NewPMCAPI(NewPubMedAPI):
                 text_parts.append(child.tail)
         
         return "".join(text_parts).strip()
+    
+
+
+    def _batcher(self, new_uids: list, batch_size: int):
+        """Create batches of size batch_size of new UIDs"""
+        iterator = iter(new_uids)
+        while True: 
+            batch = list(islice(iterator, batch_size))
+            if not batch: #meaning the iterator is consumed, which will give an empty batch
+                break
+            yield batch
+
+
+
+    def _combine_methods(self, data_to_post:dict, batch:list):
+        """This is just to combine the _send_post_request and _parse_pmc_xml methods in one method
+        so I can pass them to the submet method of the ThreadPoolExecutor."""
+        xml_response = self._send_post_request('fetch', data_to_post)
+        return self._parse_pmc_xml(xml_response)
+
+
     
 
 

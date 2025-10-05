@@ -211,7 +211,7 @@ class StreamingOptimizedNLP:
 
         for i in range(0, len(to_normalize), self.batch_size):
             batch = to_normalize[i:i + self.batch_size]
-            with ThreadPoolExecutor() as executor:
+            with ThreadPoolExecutor(max_workers=8) as executor:
                 future_to_text : dict = {
                     executor.submit(self.normalizer.normalize, text) #key (a Future obj)
                     :
