@@ -76,7 +76,7 @@ def _get_data_from_apis(article_content = False,
                                                             for query in PM_QUERIES
                 ]
     #search_uids is a procedure, it has no output, but this is just to propagate errors and wait for the threads to finish
-             for future in futures:
+             for future in as_completed(futures):
                   future.result()
 
 
