@@ -1,10 +1,7 @@
-""""this will contain Extraction Process functions for the project"""
-import logging 
 
-###
-from modules.pubmed_api import PubMedAPI
-from modules.pubmedcentral_api import PubMedCentralAPI
-###
+import logging
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from modules.pubmed_api import NewPubMedAPI
 from modules.pubmedcentral_api import NewPMCAPI
@@ -73,9 +70,15 @@ def _get_data_from_apis(article_content = False,
             print("max results for 'pubmed' database is 10,000. See logs file for more info.")
 
 
-        for query in PM_QUERIES:
-            pubmed_api.search_uids(query=query, max_results= max_results)
-        
+        with ThreadPoolExecutor() as executor:
+             futures = [
+                  executor.submit(pubmed_api.search_uids, query = query, max_results = max_results) 
+                                                            for query in PM_QUERIES
+                ]
+    #search_uids is a procedure, it has no output, but this is just to propagate errors and wait for the threads to finish
+             for future in futures:
+                  future.result()
+
 
         if article_content: 
             logging.info("Extraction Process: full articles content will be fetched if available on PMC.")
