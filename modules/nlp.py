@@ -219,7 +219,7 @@ class StreamingOptimizedNLP:
                 }
                 
 #get the normalization as soon as it's done (in the order they finish, not in submission order)
-                for future in as_completed(future_to_text.keys()): 
+                for future in as_completed(future_to_text): 
                     text = future_to_text[future]
                     try:
                         normalization_result = future.result()
