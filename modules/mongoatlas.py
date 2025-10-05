@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from pymongo import errors
 from pymongo.server_api import ServerApi
-from datetime import datetime
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -55,7 +54,7 @@ class MongoAtlasConnector:
         
         logging.info("AtlasConnector: inserting new docs, already present or empty ones are ignored.")
         with ThreadPoolExecutor(max_workers = 16) as executor:
-            futures = [executor.submit(self._load, article)
+            futures = [executor.submit(self._helper_load, article)
                         for article in tqdm(all_articles, desc="inserting new docs, present and empty ones are ignored")
                         ]
             
@@ -70,7 +69,7 @@ class MongoAtlasConnector:
 
 
 
-    def _load(self, article : dict):
+    def _helper_load(self, article : dict):
         """loads the provided article to MongoDB Atlas"""
         try:
             if article['abstract']: #ignoring empty articles.
@@ -97,20 +96,19 @@ class MongoAtlasConnector:
         except errors.PyMongoError as e: 
             logging.error(f"AtlasConnector: unable to fetch docs: {e}.")
             raise
+
         logging.info("AtlasConnector: fetching docs from MongoDB Atlas.")
-        #for doc in tqdm(cursor, desc="fetching docs from MongoDB Atlas..."):
-        with ThreadPoolExecutor(max_workers=16) as executor:
-            futures = [executor.submit(self._fetch, doc)
-                        for doc in tqdm(cursor, desc="fetching docs from MongoDB Atlas...")
-                        ]
-            for future in as_completed(futures):
-                articles.append(future.result())
-        
+        articles = []
+        for doc in tqdm(cursor, desc="fetching docs from MongoDB Atlas..."):
+            article = self._helper_fetch(doc)
+            if article:
+                articles.append(article)
+                
         logging.info("AtlasConnector: articles fetched successfully from MongoDB Atlas.")
         return articles
     
 
-    def _fetch(self, doc) -> dict:
+    def _helper_fetch(self, doc) -> dict:
         """fetches the provided doc from MongoDB Atlas"""
         try:
             if isinstance(doc['abstract'], str) or ('body' in doc.keys() and isinstance(doc['body'], str)):
