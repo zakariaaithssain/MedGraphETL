@@ -18,7 +18,6 @@ class StreamingOptimizedNLP:
                  entities_output_path: str,
                  relations_output_path: str,
                  batch_size: int = 50, 
-                 max_workers: int = 8,
                  buffer_size: int = 1000):
 
        #supressing a future warning coming from inside spacy load 
@@ -37,7 +36,6 @@ class StreamingOptimizedNLP:
         
         # Performance optimization settings
         self.batch_size = batch_size
-        self.max_workers = max_workers
         self.buffer_size = buffer_size
         
         # Output paths for streaming
@@ -213,7 +211,7 @@ class StreamingOptimizedNLP:
 
         for i in range(0, len(to_normalize), self.batch_size):
             batch = to_normalize[i:i + self.batch_size]
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            with ThreadPoolExecutor() as executor:
                 future_to_text : dict = {
                     executor.submit(self.normalizer.normalize, text) #key (a Future obj)
                     :
