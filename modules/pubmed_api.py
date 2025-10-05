@@ -156,7 +156,6 @@ to batch PubMed search results automatically so that an arbitrary number can be 
         new_uids = self.uids_cache - self.old_cache
         logging.info(f"PubMed API: {len(new_uids)} new UIDs articles to fetch.")
         
-        articles = []
         batches = list(self._batcher(new_uids, batch_size))
         articles = []
 
