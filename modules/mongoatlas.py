@@ -9,6 +9,8 @@ import datetime
 
 from config.mongodb_config import DB_STRUCTURE
 
+from config.secrets import MONGO_CONNECTION_STR
+
 
 #TODO: clean the database from old data before running the fetching script
 #TODO: add logic to load_articles_to_cloud that verifies also that the body
@@ -103,7 +105,7 @@ class MongoAtlasConnector:
             article = self._helper_fetch(doc)
             if article:
                 articles.append(article)
-                
+
         logging.info("AtlasConnector: articles fetched successfully from MongoDB Atlas.")
         return articles
     
@@ -140,5 +142,20 @@ class MongoAtlasConnector:
         except Exception as e: 
             logging.error(f"AtlasConnector: unable to fetch article with PMid {article.get('pmid')}: {e}.")
             return {}
+        
 
+    def clear_collection(self):
+        """
+        #USE WITH CAUTION, this deletes all documents in the connected MongoDB Atlas collection to start fresh.
+        
+        """
+        try:
+            result = self.collection.delete_many({})  # {} matches all documents
+            logging.info(f"AtlasConnector: cleared collection. {result.deleted_count} documents deleted.")
+        except errors.PyMongoError as e:
+            logging.error(f"AtlasConnector: failed to clear collection: {e}.")
+            raise
 
+if __name__ == "__main__":
+    connector = MongoAtlasConnector(MONGO_CONNECTION_STR)
+    connector.clear_collection()
