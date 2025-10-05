@@ -9,7 +9,6 @@ import datetime
 
 from config.mongodb_config import DB_STRUCTURE
 
-from config.secrets import MONGO_CONNECTION_STR
 
 
 #TODO: clean the database from old data before running the fetching script
@@ -35,7 +34,6 @@ class MongoAtlasConnector:
             #no need to continue the execution if connection failed
             raise
 
-
         self.db = self.cluster[DB_STRUCTURE['database']]
         self.collection = self.db[DB_STRUCTURE['collection']]
 
@@ -45,6 +43,21 @@ class MongoAtlasConnector:
 
         # using 'pmid' to prevent duplicates
         self.collection.create_index("pmid", unique=True)
+
+    
+    def __enter__(self):
+        return self
+    
+    
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.cluster:
+            self.cluster.close()
+            logging.info("AtlasConnector: connection closed.")
+        if exc_type: 
+            logging.exception(f"AtlasConnector: unable to close connection, exception: {exc_val}")
+
+
 
         
 
@@ -59,9 +72,9 @@ class MongoAtlasConnector:
             futures = [executor.submit(self._helper_load, article)
                         for article in tqdm(all_articles, desc="inserting new docs, present and empty ones are ignored")
                         ]
-            
+                        
             #just to wait for each thread, and to propagate errors if any (since _load is just a procedure)
-            for future in as_completed(futures): 
+            for future in as_completed(futures, timout = 5): 
                 future.result() 
 
         logging.info("AtlasConnector: articles inserted successfully to MongoDB Atlas.")
@@ -156,6 +169,3 @@ class MongoAtlasConnector:
             logging.error(f"AtlasConnector: failed to clear collection: {e}.")
             raise
 
-if __name__ == "__main__":
-    connector = MongoAtlasConnector(MONGO_CONNECTION_STR)
-    connector.clear_collection()

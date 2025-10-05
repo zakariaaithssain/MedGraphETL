@@ -20,10 +20,6 @@ pubmed_api = NewPubMedAPI(api_key = PM_API_KEY_EMAIL["api_key"],
 pubmedcentral_api = NewPMCAPI(api_key = PM_API_KEY_EMAIL["api_key"],
                                         email = PM_API_KEY_EMAIL["email"])
 
-mongo_connector = MongoAtlasConnector(connection_str=MONGO_CONNECTION_STR)
-
-
-
 
 def extract_pubmed_to_mongo(article_content: bool = False,
                                             max_results: int = None,
@@ -39,8 +35,8 @@ def extract_pubmed_to_mongo(article_content: bool = False,
             """
     try: 
         all_articles = _get_data_from_apis(article_content, max_results, batch_size)
-        
-        mongo_connector.load_articles_to_atlas(all_articles)
+        with MongoAtlasConnector(MONGO_CONNECTION_STR) as connector: 
+            connector.load_articles_to_atlas(all_articles)
 
     except KeyboardInterrupt: 
         logging.error("Extraction process interrupted manually.")
