@@ -58,7 +58,7 @@ python main.py --max-results 1000 --batch-size 200
 ##  System Requirements
 
 ### Dependencies
-- Latest versions of Python I guess
+- This project uses 'spaCy' that depends on 'thinc' which uses deprecated Python C API functions that were removed in newer Python versions. So use the Python version that is specified in .python-version file.
 - PubMed API account email and API key (optional but increases the number of tolerated API calls, and needs sleep time configuration): https://account.ncbi.nlm.nih.gov
 - UMLS API API key (obligatory):  https://uts.nlm.nih.gov/
 - MongoDB Atlas Account:  https://www.mongodb.com/cloud/atlas/register
