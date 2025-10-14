@@ -232,7 +232,7 @@ Examples:
         else:
             success = run_etl(
                 max_results=args.max_results,
-                article_content= args.full_content,
+                article_content= args.article_content,
                 batch_size=args.batch_size,
                 load_batch_size=args.load_batch_size
             )
