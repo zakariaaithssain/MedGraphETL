@@ -12,9 +12,7 @@ from config.mongodb_config import DB_STRUCTURE
 
 
 
-#TODO: clean the database from old data before running the fetching script
-#TODO: add logic to load_articles_to_cloud that verifies also that the body
-#  is not None before inserting to cloud
+
 
 """
     a cluster contains multiple databases, a database contains multiple collections,
