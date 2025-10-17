@@ -1,8 +1,9 @@
 from pymongo import MongoClient
 from pymongo import errors
+from pymongo import UpdateOne
 from pymongo.server_api import ServerApi
 from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from itertools import islice
 
 import logging
 import datetime
@@ -62,41 +63,64 @@ class MongoAtlasConnector:
         
 
 
-    def load_articles_to_atlas(self, all_articles: list[dict]):
+    def load_articles_to_atlas(self, all_articles: list[dict], batch_size : int = 10000):
         """Load fetched articles data to MongoDB Atlas cloud. 
             Arguments: 
                     all_articles = list of dictionaries, each corresponds to one article's data."""
         
         logging.info("AtlasConnector: inserting new docs, already present or empty ones are ignored.")
-        with ThreadPoolExecutor(max_workers = 16) as executor:
-            futures = [executor.submit(self._helper_load, article)
-                        for article in tqdm(all_articles, desc="inserting new docs, present and empty ones are ignored")
-                        ]
-                        
-            #just to wait for each thread, and to propagate errors if any (since _load is just a procedure)
-            for future in as_completed(futures, timout = 5): 
-                future.result() 
+        batches = list(self._batcher(all_articles, batch_size))
 
-        logging.info("AtlasConnector: articles inserted successfully to MongoDB Atlas.")
+        with tqdm(total=len(all_articles), desc="Inserting new docs") as pbar:
+            for batch in batches:
+                self._helper_load(batch, pbar)
+                
+
+
+            else: logging.info("AtlasConnector: articles inserted successfully to MongoDB Atlas.")
             
         
 
 
 
 
-    def _helper_load(self, article : dict):
-        """loads the provided article to MongoDB Atlas"""
+    def _helper_load(self, batch: list[dict], pbar: tqdm): 
+        """Loads a batch of articles to MongoDB Atlas.
+        Params: 
+                batch: the batch of articles to load
+                pbar: tqdm instance to be updated."""
         try:
-            if article['abstract']: #ignoring empty articles.
-                # adding the date of fetching the article (utc: coordinated universal time)
-                article["fetchingdate"] = datetime.datetime.now(datetime.timezone.utc) 
-                self.collection.update_one(
-                    {"pmid": article["pmid"]},     # matching by PubMed id
-                    {"$setOnInsert": article},   
-                    upsert=True                    #insert if no doc with that pmid is already there
-                )
+            operations = []
+            for article in batch:
+                if article.get("abstract"):  # ignore empty abstracts
+                    article["fetchingdate"] = datetime.datetime.now(datetime.timezone.utc)
+                    operations.append(
+                        UpdateOne(
+                            {"pmid": article["pmid"]},
+                            {"$setOnInsert": article},
+                            upsert=True
+                        )
+                    )
+                    pbar.update(1)
+                    pbar.refresh()
+
+            if operations:  # only execute if we have something to insert
+                result = self.collection.bulk_write(operations, ordered=False)
+                logging.info(f"AtlasConnector: inserted {result.upserted_count} new docs.")
+
+        except errors.BulkWriteError as e:
+            logging.error(f"AtlasConnector: Bulk write error: {e.details}")
         except errors.PyMongoError as e:
-            logging.error(f"AtlasConnector: enable to store article with PMid: {article.get('pmid')}: {e}.")
+            logging.error(f"AtlasConnector: unable to store batch of articles: {e}")
+
+    def _batcher(self, all_articles: list, batch_size: int):
+            """Create batches of size batch_size of articles list"""
+            iterator = iter(all_articles)
+            while True: 
+                batch = list(islice(iterator, batch_size))
+                if not batch: #meaning the iterator is consumed, which will give an empty batch
+                    break
+                yield batch
 
 
     
