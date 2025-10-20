@@ -1,4 +1,5 @@
-# -------------------------------
+#NER model used
+NER_MODEL = "en_ner_bionlp13cg_md"
 # TOKEN-BASED MATCHER PATTERNS
 # -------------------------------
 MATCHER_PATTERNS = {

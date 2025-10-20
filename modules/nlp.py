@@ -10,8 +10,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from spacy.matcher import Matcher, DependencyMatcher
 
 from modules.umls_api import UMLSNormalizer
-from config.nlp_config import MATCHER_PATTERNS, DEPENDENCY_MATCHER_PATTERNS
-from config.nlp_config import GENERIC_ENTITIES
+from config.nlp_config import MATCHER_PATTERNS, DEPENDENCY_MATCHER_PATTERNS, GENERIC_ENTITIES, NER_MODEL
 
 class StreamingOptimizedNLP:
     def __init__(self, normalizer: UMLSNormalizer, 
@@ -24,7 +23,7 @@ class StreamingOptimizedNLP:
         warnings.filterwarnings("ignore", category=FutureWarning, module="spacy")
         logging.info("NLP: Loading NER Model...")
         print("loading ner model...")
-        self.nlp_pipe = spacy.load("en_ner_bionlp13cg_md") 
+        self.nlp_pipe = spacy.load(NER_MODEL) 
         self.nlp_pipe.add_pipe("merge_entities", after="ner")
         
         # Initialize matchers with model vocab
