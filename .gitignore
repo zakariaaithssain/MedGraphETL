@@ -6,3 +6,5 @@ htmlcov/
 .vscode/
 config/secrets.py
 report/
+main.log
+main.pdf
