@@ -61,13 +61,14 @@ class MongoAtlasConnector:
         
 
 
-    def load_articles_to_atlas(self, all_articles: list[dict], batch_size : int = 10000):
+    def load_articles_to_atlas(self, all_articles: list[dict], bulk_size : int = 10000):
         """Load fetched articles data to MongoDB Atlas cloud. 
             Arguments: 
-                    all_articles = list of dictionaries, each corresponds to one article's data."""
+                    all_articles = list of dictionaries, each corresponds to one article's data.
+                    batch_size = number of articles to load to Mongo per bulk write."""
         
         logging.info("AtlasConnector: inserting new docs, already present or empty ones are ignored.")
-        batches = list(self._batcher(all_articles, batch_size))
+        batches = list(self._batcher(all_articles, bulk_size))
 
         with tqdm(total=len(all_articles), desc="Inserting new docs") as pbar:
             for batch in batches:
