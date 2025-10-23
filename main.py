@@ -11,13 +11,13 @@ from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
 def extract_stage(article_content: bool = False,
                     max_results: int = None,
-                    batch_size: int = 1000
+                    batch_size: int = 1000, bulk_size: int = 10000
     ):
     """Step 1: Extract articles from PubMed to MongoDB."""
     try:
         logging.info("Starting extraction stage.")
         print("Starting extraction stage...")
-        extract_pubmed_to_mongo(article_content, max_results, batch_size
+        extract_pubmed_to_mongo(article_content, max_results, batch_size, bulk_size
         )
         logging.info("Extraction stage completed.")
         print("Extraction stage completed.")
@@ -112,6 +112,7 @@ def load_stage(ents_clean_csv='data/ready_for_neo4j/entities4neo4j.csv',
 def run_etl(article_content: bool = False,
     max_results: int = None,
     batch_size: int = 1000,
+    bulk_size: int= 10000,
     load_batch_size=1000):
     """Full ETL pipeline orchestrator."""
     try:
@@ -120,7 +121,7 @@ def run_etl(article_content: bool = False,
         print("ETL PIPELINE STARTING")
         print("=" * 50)
         
-        if not extract_stage(article_content, max_results, batch_size):
+        if not extract_stage(article_content, max_results, batch_size, bulk_size):
             print("ETL pipeline stopped: Extraction stage failed or was interrupted.")
             logging.error("ETL pipeline stopped: Extraction stage failed or was interrupted.")
             return False
@@ -167,7 +168,7 @@ def main():
         description="Medical Graph ETL Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
+No Flags Examples:
   python main.py                    # Run full ETL pipeline
   python main.py extract            # Run only extraction stage
   python main.py annotate           # Run only annotation stage
@@ -202,6 +203,12 @@ Examples:
         default=1000,
         help="Batch size for loading nodes and relationships to Neo4j (default: 1000)"
     )
+    parser.add_argument(
+        "--bulk-size",
+        type=int,
+        default=10000,
+        help="Bulk size for loading articles to Mongo per bulk write operation (default: 10000)"
+    )
     
     parser.add_argument(
         "--article-content",
@@ -218,7 +225,8 @@ Examples:
             success = extract_stage(
                 max_results=args.max_results,
                 article_content=args.article_content,
-                batch_size=args.batch_size
+                batch_size=args.batch_size,
+                bulk_size = args.bulk_size
             )
         elif args.step == "annotate":
             success = annotate_stage()
@@ -234,6 +242,7 @@ Examples:
                 max_results=args.max_results,
                 article_content= args.article_content,
                 batch_size=args.batch_size,
+                bulk_size=args.bulk_size,
                 load_batch_size=args.load_batch_size
             )
     
