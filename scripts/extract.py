@@ -7,18 +7,18 @@ from modules.pubmed_api import NewPubMedAPI
 from modules.pubmedcentral_api import NewPMCAPI
 from modules.mongoatlas import MongoAtlasConnector
 
-from config.secrets import PM_KEY_EMAIL
+from config.secrets import PM_API_KEY_EMAIL
 from config.apis_config import PM_QUERIES
 from config.secrets import MONGO_CONNECTION_STR
 
 
 
 #api key and email are optional, but if not provided, we have less requests rate. 
-pubmed_api = NewPubMedAPI(key = PM_KEY_EMAIL["key"],
-                        email = PM_KEY_EMAIL["email"])
+pubmed_api = NewPubMedAPI(api_key = PM_API_KEY_EMAIL["api_key"],
+                        email = PM_API_KEY_EMAIL["email"])
 
-pubmedcentral_api = NewPMCAPI(key = PM_KEY_EMAIL["key"],
-                                        email = PM_KEY_EMAIL["email"])
+pubmedcentral_api = NewPMCAPI(api_key = PM_API_KEY_EMAIL["api_key"],
+                                        email = PM_API_KEY_EMAIL["email"])
 
 
 def extract_pubmed_to_mongo(article_content: bool = False,
@@ -42,7 +42,6 @@ def extract_pubmed_to_mongo(article_content: bool = False,
     except KeyboardInterrupt: 
         logging.error("Extraction process interrupted manually.")
         raise
-
 
 
 
@@ -120,11 +119,11 @@ def _get_data_from_apis(article_content = False,
 ################## THIS WILL SOON BE DEPRECATED ######################################################
 
 # #api key and email are optional, but if not provided, we have less requests rate. 
-# pubmed_api = PubMedAPI(key = PM_KEY_EMAIL["key"],
-#                         email = PM_KEY_EMAIL["email"])
+# pubmed_api = PubMedAPI(key = PM_API_KEY_EMAIL["api_key"],
+#                         email = PM_API_KEY_EMAIL["email"])
 
-# pubmedcentral_api = PubMedCentralAPI(key = PM_KEY_EMAIL["key"],
-#                                         email = PM_KEY_EMAIL["email"])
+# pubmedcentral_api = PubMedCentralAPI(key = PM_API_KEY_EMAIL["api_key"],
+#                                         email = PM_API_KEY_EMAIL["email"])
 
 # mongo_connector = MongoAtlasConnector(connection_str=MONGO_CONNECTION_STR)
 

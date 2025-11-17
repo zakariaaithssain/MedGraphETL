@@ -137,41 +137,48 @@ class MongoAtlasConnector:
 
         logging.info("AtlasConnector: fetching docs from MongoDB Atlas.")
         articles = []
-        for doc in tqdm(cursor, desc="fetching docs from MongoDB Atlas..."):
-            article = self._helper_fetch(doc)
-            if article:
-                articles.append(article)
+        with tqdm(total=self.collection.count_documents(query), desc="fetching docs from MongoDB Atlas") as pbar:
+            for doc in cursor:
+                article = self._helper_fetch(doc, pbar)
+                if article:
+                    articles.append(article)
 
         logging.info("AtlasConnector: articles fetched successfully from MongoDB Atlas.")
         return articles
     
 
-    def _helper_fetch(self, doc) -> dict:
+    def _helper_fetch(self, doc, pbar:tqdm) -> dict:
         """fetches the provided doc from MongoDB Atlas"""
         try:
-            if isinstance(doc['abstract'], str) or ('body' in doc.keys() and isinstance(doc['body'], str)):
+            if ('abstract' in doc and  isinstance(doc['abstract'], str)) or ('body' in doc and isinstance(doc['body'], str)):
                 article = {}
 
-                article['pmid'] = doc['pmid']
-                article['pmcid'] = doc['pmid'] #will be null if article not available in MPCentral.
-                article['fetching_date'] = doc['fetchingdate']
-
+                article['pmid'] = doc['pmid'] if 'pmid' in doc else None
+                article['pmcid'] = doc['pmcid'] if 'pmcid' in doc else None 
+                article['fetching_date'] = doc['fetchingdate'] if 'fetchingdate' in doc else None
                 texts = []
-                #add keywords and MeSH to texts.
-                keywords = [elt for elt in doc['keywords'] if isinstance(elt, str)]
-                mesh = [elt for elt in doc['medical_subject_headings'] if isinstance(elt, str)]
-                texts.extend(mesh)
-                texts.extend(keywords)
+
                 #add abstract and title to text
                 if isinstance(doc.get('abstract'), str):
                     texts.append(doc['abstract'])
-                if isinstance(doc['title'], str): 
+                if 'title' in doc and isinstance(doc['title'], str): 
                     texts.append(doc['title'])
                 #add body, it can be missing if we only fetched abstracts.
-                if 'body' in doc.keys() and isinstance(doc['body'], str):
+                if 'body' in doc and isinstance(doc['body'], str):
                     texts.append(doc['body']) 
+                #add keywords and MeSH to texts.
+                if 'keywords' in doc:
+                    keywords = [elt for elt in doc['keywords'] if isinstance(elt, str)]
+                    texts.extend(keywords)
+
+                if 'medical_subject_headings' in doc: 
+                    mesh = [elt for elt in doc['medical_subject_headings'] if isinstance(elt, str)]
+                    texts.extend(mesh)
+                
 
                 article['text'] = " ".join(texts)
+                pbar.update(1)
+                pbar.refresh()
 
                 return article
             
