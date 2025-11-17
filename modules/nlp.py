@@ -4,9 +4,9 @@ import logging
 import pickle
 import hashlib
 import warnings
-
+import os
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor,ProcessPoolExecutor,  as_completed
 from spacy.matcher import Matcher, DependencyMatcher
 
 from modules.umls_api import UMLSNormalizer
@@ -159,7 +159,7 @@ class StreamingOptimizedNLP:
 
     
     def _generate_cache_key(self, text: str) -> str:
-        """Generate a MD5 hash key (id) for caching normalized entities."""
+        """Generate a MD5 hash unique key for caching normalized entities."""
         return hashlib.md5(text.lower().strip().encode()).hexdigest()
     
     def _load_cache(self):
@@ -169,14 +169,19 @@ class StreamingOptimizedNLP:
                 self._normalization_cache = pickle.load(f)
             logging.info(f"NLP: Loaded {len(self._normalization_cache)} cached normalizations.")
         except FileNotFoundError:
-            logging.info("NLP: No existing cache found, starting fresh.")
+            logging.info("NLP: no cache found, starting fresh.")
+        except (EOFError, pickle.UnpicklingError): 
+            logging.warning("NLP: cache file corrupted, starting fresh.")
     
     def _save_cache(self):
-        """Save normalization cache to disk. Cache grows each time we run the pipeline,
-        because in __init__ we call _load_cache to re-add old cache to the new one"""
+        """Atomic writing of normalization cache to disk."""
+        temp = 'cache/normalization_cache.pkl.tmp'
+        final = 'cache/normalization_cache.pkl'
         try:
-            with open('cache/normalization_cache.pkl', 'wb') as f:
+            with open(temp, 'wb') as f:
                 pickle.dump(self._normalization_cache, f)
+            os.replace(temp, final) #only set it to the final file if it's fully written. 
+
             logging.info(f"NLP: Saved {len(self._normalization_cache)} normalizations to cache")
         except Exception as e:
             logging.error(f"NLP: Failed to save normalizations to cache: {e}")
@@ -192,14 +197,16 @@ class StreamingOptimizedNLP:
         results = {}
         to_normalize = []
         
-        # Check cache first
+        
         for text in entity_texts:
-            cache_key = self._generate_cache_key(text)
-            if cache_key in self._normalization_cache:
-                results[text] = self._normalization_cache[cache_key]
-            elif self._should_normalize(text):
-                to_normalize.append(text)
-            else:
+            
+            if self._should_normalize(text):
+                #Check cache first
+                cache_key = self._generate_cache_key(text)
+                if cache_key in self._normalization_cache:
+                    results[text] = self._normalization_cache[cache_key]
+                else: to_normalize.append(text)
+            else: # meaningless entity
                 results[text] = {"cui": "", "normalized_name": "", "normalization_source": ""}
         
         if not to_normalize:
@@ -217,7 +224,6 @@ class StreamingOptimizedNLP:
                     text for text in batch # value (text)
                 }
                 
-#get the normalization as soon as it's done (in the order they finish, not in submission order)
                 for future in as_completed(future_to_text): 
                     text = future_to_text[future]
                     try:
@@ -252,7 +258,7 @@ class StreamingOptimizedNLP:
         
         for ent in doc.ents:
             lemma = ent.lemma_.strip().lower()
-            #we have nothing to do with generic entities (e.g. cancer, tumor...)
+            #we have nothing to do with generic entities (e.g. 'cancer', 'tumor'...)
             if lemma not in GENERIC_ENTITIES:
                 if __name__ == "__main__": 
                     print(f"entity: {lemma} --- label: {ent.label_}\n ******* ")
@@ -293,10 +299,10 @@ class StreamingOptimizedNLP:
                 self._entity_cache.add(entity_key)
                 final_entities.append(entity_dict)
         
-        # Add to buffer instead of directly to entities list
+        #add to buffer instead of directly to entities list
         self._entities_buffer.extend(final_entities)
         
-        # Flush buffer if it's full
+        #flush buffer if it's full
         self._flush_entities_buffer()
         
         logging.info(f"NLP: Added {len(final_entities)} new unique entities to buffer")

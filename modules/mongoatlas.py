@@ -4,6 +4,7 @@ from pymongo import UpdateOne
 from pymongo.server_api import ServerApi
 from tqdm import tqdm
 from itertools import islice
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import logging
 import datetime
@@ -130,7 +131,7 @@ class MongoAtlasConnector:
         """
         articles = []
         try: 
-            cursor = self.collection.find(query) #it returns a cursor, we must iterate through it.
+            cursor = self.collection.find(query) #it returns a cursor to iterate.
         except errors.PyMongoError as e: 
             logging.error(f"AtlasConnector: unable to fetch docs: {e}.")
             raise
@@ -138,6 +139,7 @@ class MongoAtlasConnector:
         logging.info("AtlasConnector: fetching docs from MongoDB Atlas.")
         articles = []
         with tqdm(total=self.collection.count_documents(query), desc="fetching docs from MongoDB Atlas") as pbar:
+            #cursors are not thread-safe, so no multithreading is possible here
             for doc in cursor:
                 article = self._helper_fetch(doc, pbar)
                 if article:
