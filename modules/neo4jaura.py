@@ -5,6 +5,7 @@ import pandas as pd
 
 from neo4j import GraphDatabase, Transaction
 from neo4j.exceptions import Neo4jError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from tqdm import tqdm
 import logging
@@ -55,7 +56,6 @@ class Neo4jAuraConnector:
             logging.error(f"AuraConnector: {exception_value}")
         return False #don't supress errors
 
-
     def load_ents_to_aura(self, labels_to_load : list[str], ents_clean_csv: str):
         assert all(label in NEO4J_LABELS for label in labels_to_load), f"{labels_to_load} contains invalid label(s), valid: {NEO4J_LABELS}"
         """Load entities from the cleaned ents csv to Neo4j Aura. 
@@ -64,20 +64,24 @@ class Neo4jAuraConnector:
             that we want to load. (exp: 'GENE')
             ents_clean_csv = path of the cleaned ents csv."""
         failed_to_load = [] #will contain labels that weren't able to be loaded.
-        #one session for more efficiency
-        with self.driver.session() as session:
-                for label in tqdm(labels_to_load, desc=f"loading nodes"): 
-                    logging.info(f"AuraConnector: Loading {label} Nodes")
-                    #one transaction per entity to ensure ACID propreties.
-                    try:
+        
+        def combiner(label):
+                logging.info(f"AuraConnector: Loading {label} Nodes")
+                try:
+                    with self.driver.session() as session: 
                         with session.begin_transaction() as transaction: 
                             nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv)
                             self._ents_batch_load(label, nodes_list=nodes_with_label, transaction= transaction)
-                    except Exception as e:
-                        failed_to_load.append({"label" : label, "error" : str(e)})
-                    
-                if failed_to_load: logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
-                else: logging.info("AuraConnector:Loaded Successfully")
+                            transaction.commit()
+                except Exception as e:
+                    failed_to_load.append({"label" : label, "error" : str(e)})
+        
+        with ThreadPoolExecutor(max_workers=17) as executor: 
+            futures = [executor.submit(combiner, label) for label in labels_to_load]
+            for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): future.result()
+
+        if failed_to_load: logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
+        else: logging.info("AuraConnector:Loaded Successfully")
 
     
     def load_rels_to_aura(self, reltypes_to_load : list[str], rels_clean_csv: str):
@@ -105,17 +109,18 @@ class Neo4jAuraConnector:
 
 
 
-    def _ents_batch_load(self, label: str, nodes_list: list[dict], transaction : Transaction):
-        """Entities (nodes) Batch load using UNWIND for optimal performance
+  
+    def _ents_batch_load(self, label: str, nodes_list: list[dict], transaction: Transaction):
+        """loads nodes to Neo4j using UNWIND bulk write
         Parameters:
         label = "the label for the nodes to load. (exp 'GENE')
-        nodes_list = list containing nodes to load, each is a dict.
+        nodes_list = list containing nodes to load, each is a dict, they must have the same label.
         transaction = neo4j transaction instance
 
         """
         
         query = f"""
-            UNWIND $batch AS row
+            UNWIND $nodes AS row
             MERGE (n:{label} {{id: row.id}})
             SET n += {{
                 name: row.name,
@@ -125,16 +130,15 @@ class Neo4jAuraConnector:
             }}
             """
         try: 
-            for i in range(0, len(nodes_list), self.load_batch_size):
-                batch = nodes_list[i:i + self.load_batch_size]
-                transaction.run(query, {"batch":batch})
+            transaction.run(query, {"nodes":nodes_list})
         except Neo4jError as ne:
             logging.error(f"AuraConnector: Neo4jError: {ne}")
             raise
         except Exception as e:
             logging.error(f"AuraConnector: {e}")
             raise
-        
+
+    
     def _rels_batch_load(self, relation_type: str, relations_list: list[dict], transaction : Transaction):
         """Relations Batch load using UNWIND for optimal performance
         Parameters:

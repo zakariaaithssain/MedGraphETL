@@ -7,9 +7,12 @@ from modules.umls_api import UMLSNormalizer
 from modules.nlp import StreamingOptimizedNLP
 
 from config.secrets import MONGO_CONNECTION_STR
+
+
+
 global_annotator = None
 def get_annotator():
-    "this actually loads it once to the memory, but creates a unique one for each worker (I guess)"
+    "this actually loads the annotator once to the memory, but creates a unique one for each worker (I guess)"
     global global_annotator
     if global_annotator == None: 
         global_annotator = StreamingOptimizedNLP(

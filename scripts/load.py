@@ -33,9 +33,10 @@ def load_to_aura(labels_to_load:Optional[list[str]] = None,
                     connector.load_rels_to_aura(reltypes_to_load, rels_clean_csv)
         
         except KeyboardInterrupt:
-            logging.error("Load Process Interrupted Manually.")
+            logging.error("Load process interrupted manually.")
             raise
         except Exception as e:
-            logging.error(f"Load Process Failed To Load To Aura. {e}")
+            logging.error(f"Load process failed to load to Aura. {e}")
+            raise
     
         
