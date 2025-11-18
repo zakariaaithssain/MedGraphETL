@@ -9,3 +9,5 @@ report/
 main.log
 main.pdf
 presentation/
+data/extracted_entities.csv
+data/extracted_relations.csv
