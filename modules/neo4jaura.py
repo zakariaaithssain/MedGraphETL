@@ -65,9 +65,10 @@ class Neo4jAuraConnector:
             ents_clean_csv = path of the cleaned ents csv."""
         failed_to_load = [] #will contain labels that weren't able to be loaded.
         
-        def combiner(label):
-                logging.info(f"AuraConnector: Loading {label} Nodes")
-                try:
+        def _combiner(label):
+            
+                logging.info(f"AuraConnector: Loading {label} nodes")
+                try: #only one transaction per session, and one session per thread
                     with self.driver.session() as session: 
                         with session.begin_transaction() as transaction: 
                             nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv)
@@ -76,9 +77,11 @@ class Neo4jAuraConnector:
                 except Exception as e:
                     failed_to_load.append({"label" : label, "error" : str(e)})
         
-        with ThreadPoolExecutor(max_workers=17) as executor: 
-            futures = [executor.submit(combiner, label) for label in labels_to_load]
-            for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): future.result()
+    #number of workers equals to the number of labels, a worker per label.
+        with ThreadPoolExecutor(max_workers=len(labels_to_load)) as executor: 
+            futures = [executor.submit(_combiner, label) for label in labels_to_load]
+            for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): 
+                future.result()
 
         if failed_to_load: logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
         else: logging.info("AuraConnector:Loaded Successfully")
@@ -93,19 +96,27 @@ class Neo4jAuraConnector:
         
         assert all(reltype in NEO4J_REL_TYPES for reltype in reltypes_to_load), f" {reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
         failed_to_load = []
-        with self.driver.session() as session:
-            for reltype in tqdm(reltypes_to_load, desc=f"loading relations"): 
-                logging.info(f"AuraConnector: Loading {reltype} Relations")
-                try:
-                    with session.begin_transaction() as transaction: 
-                        relations_with_reltype = self._get_relations_with_type(reltype, rels_clean_csv)
-                        self._rels_batch_load(reltype,relations_list=relations_with_reltype, transaction = transaction)
-                except Exception as e: 
-                    failed_to_load.append({"reltype":reltype, "error": str(e)})
-            if failed_to_load: 
-                logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
-            else: 
-                logging.info(f"AuraConnector: Loaded Successfully.")
+        def _combiner(reltype):
+            logging.info(f"AuraConnector: Loading {reltype} relations")
+            try: #one session per thread, combined with execute_write built-in to handle deadlocks
+                relations_with_reltype = self._get_relations_with_type(reltype, rels_clean_csv)
+                with self.driver.session() as session:
+                    session.execute_write(self._rels_batch_load,
+                                            reltype,
+                                            relations_with_reltype)
+            except Exception as e: 
+                failed_to_load.append({"reltype":reltype, "error": str(e)})
+
+    #number of workers equals to the number of relations types, a worker per type.
+        with ThreadPoolExecutor(max_workers=len(reltypes_to_load)) as executor: 
+            futures = [executor.submit(_combiner, reltype) for reltype in reltypes_to_load]
+            for future in tqdm(futures, desc="loading relations:", total=len(reltypes_to_load)):
+                future.result()
+
+        if failed_to_load: 
+            logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
+        else: 
+            logging.info(f"AuraConnector: Loaded Successfully.")
 
 
 
@@ -132,24 +143,24 @@ class Neo4jAuraConnector:
         try: 
             transaction.run(query, {"nodes":nodes_list})
         except Neo4jError as ne:
-            logging.error(f"AuraConnector: Neo4jError: {ne}")
+            logging.error(f"AuraConnector: Neo4j error: {ne}")
             raise
         except Exception as e:
             logging.error(f"AuraConnector: {e}")
             raise
 
-    
-    def _rels_batch_load(self, relation_type: str, relations_list: list[dict], transaction : Transaction):
-        """Relations Batch load using UNWIND for optimal performance
+    #1st arg after self should be a transaction (and it is injected by execute_write automatically)
+    def _rels_batch_load(self, transaction : Transaction, relation_type: str, relations_list: list[dict]):
+        """load relations to Neo4j using UNWIND bulk write
         Parameters:
-        relation_type = "the relation_type for the relations to load. (exp 'GENE')
-        relations_list: list containing relations to load, each is a dict.
+        relation_type = "the relation type for the relations to load. (exp 'CAUSES')
+        relations_list: list containing relations to load, each is a dict, they must have the same type
         transaction: neo4j transaction instance
 
         """
         
         query = f"""
-        UNWIND $batch AS row
+        UNWIND $relations AS row
         MATCH (start {{id: row.start_id}})
         MATCH (end {{id: row.end_id}})
         MERGE (start)-[r:{relation_type}]->(end)
@@ -159,11 +170,9 @@ class Neo4jAuraConnector:
                  }}
         """
         try: 
-            for i in range(0, len(relations_list), self.load_batch_size):
-                batch = relations_list[i:i + self.load_batch_size]
-                transaction.run(query, {"batch":batch})
+            transaction.run(query, {"relations":relations_list})
         except Neo4jError as ne:
-            logging.error(f"AuraConnector: Neo4j Error: {ne}")
+            logging.error(f"AuraConnector: Neo4j error: {ne}")
             raise
         except Exception as e:
             logging.error(f"AuraConnector: {e}")
