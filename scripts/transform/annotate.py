@@ -24,7 +24,9 @@ def get_annotator():
 
 
 def combiner( text, article):
-    "combine methods so they can be passed to Process Pool Executor, this should be defined at top level because of the way python passes it to workers (look this up, about pickle etc.)"
+    "combines entities and relations extraction with normalization methods so they"
+    " can be passed to Process Pool Executor, "
+    "this should be defined at top level because of the way processpool works (look this up, about pickle etc.)"
     annotator = get_annotator()
     (annotator.extract_and_normalize_entities(text, article_metadata= article)
                     .extract_relations(text, article_metadata= article))  

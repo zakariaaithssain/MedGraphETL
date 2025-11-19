@@ -1,50 +1,329 @@
-2025-11-18 20:02:02,477 - INFO - Logs file initialized.
-2025-11-18 20:02:02,859 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-11-18 20:02:02,860 - INFO - PubMed API: email used.
-2025-11-18 20:02:02,870 - INFO - PubMed API: loaded 36123 UIDs from cache.
-2025-11-18 20:02:02,870 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-11-18 20:02:02,870 - INFO - PubMed API: email used.
-2025-11-18 20:02:02,870 - INFO - PubMed API: no cache found, starting fresh.
-2025-11-18 20:02:04,769 - INFO - Starting loading stage.
-2025-11-18 20:02:06,879 - INFO - AuraConnector: Successfully Connected To Neo4j Aura.
-2025-11-18 20:02:06,880 - INFO - AuraConnector: Loading AMINO_ACID Nodes
-2025-11-18 20:02:06,882 - INFO - AuraConnector: Loading ANATOMICAL_SYSTEM Nodes
-2025-11-18 20:02:06,883 - INFO - AuraConnector: Loading CANCER Nodes
-2025-11-18 20:02:06,884 - INFO - AuraConnector: Loading CELL Nodes
-2025-11-18 20:02:06,885 - INFO - AuraConnector: Loading CELLULAR_COMPONENT Nodes
-2025-11-18 20:02:06,886 - INFO - AuraConnector: Loading DEVELOPING_ANATOMICAL_STRUCTURE Nodes
-2025-11-18 20:02:06,888 - INFO - AuraConnector: Loading GENE_OR_GENE_PRODUCT Nodes
-2025-11-18 20:02:06,889 - INFO - AuraConnector: Loading IMMATERIAL_ANATOMICAL_ENTITY Nodes
-2025-11-18 20:02:06,890 - INFO - AuraConnector: Loading MULTI_TISSUE_STRUCTURE Nodes
-2025-11-18 20:02:06,890 - INFO - AuraConnector: Loading ORGAN Nodes
-2025-11-18 20:02:06,893 - INFO - AuraConnector: Loading ORGANISM Nodes
-2025-11-18 20:02:06,895 - INFO - AuraConnector: Loading ORGANISM_SUBDIVISION Nodes
-2025-11-18 20:02:06,896 - INFO - AuraConnector: Loading ORGANISM_SUBSTANCE Nodes
-2025-11-18 20:02:06,897 - INFO - AuraConnector: Loading PATHOLOGICAL_FORMATION Nodes
-2025-11-18 20:02:06,898 - INFO - AuraConnector: Loading SIMPLE_CHEMICAL Nodes
-2025-11-18 20:02:06,908 - INFO - AuraConnector: Loading TISSUE Nodes
-2025-11-18 20:02:16,885 - INFO - AuraConnector: Found 146 ANATOMICAL_SYSTEM Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:16,920 - INFO - AuraConnector: Found 328 ORGANISM_SUBDIVISION Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,378 - INFO - AuraConnector: Found 1391 PATHOLOGICAL_FORMATION Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,380 - INFO - AuraConnector: Found 7699 CELL Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,419 - INFO - AuraConnector: Found 998 ORGANISM_SUBSTANCE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,421 - INFO - AuraConnector: Found 10791 SIMPLE_CHEMICAL Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,456 - INFO - AuraConnector: Found 4618 ORGANISM Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,511 - INFO - AuraConnector: Found 260 AMINO_ACID Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,539 - INFO - AuraConnector: Found 22736 GENE_OR_GENE_PRODUCT Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,597 - INFO - AuraConnector: Found 16 DEVELOPING_ANATOMICAL_STRUCTURE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,619 - INFO - AuraConnector: Found 1032 MULTI_TISSUE_STRUCTURE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,631 - INFO - AuraConnector: Found 977 TISSUE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:17,874 - INFO - AuraConnector: Found 13931 CANCER Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:18,496 - INFO - AuraConnector: Found 370 ORGAN Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:18,575 - INFO - AuraConnector: Found 1736 CELLULAR_COMPONENT Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:02:19,028 - INFO - AuraConnector: Found 349 IMMATERIAL_ANATOMICAL_ENTITY Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-11-18 20:05:39,100 - INFO - AuraConnector:Loaded Successfully
-2025-11-18 20:05:39,104 - INFO - AuraConnector: Loading PRODUCES Relations
-2025-11-18 20:05:39,792 - INFO - AuraConnector: Found 44 PRODUCES Relations In data/ready_for_neo4j/relations4neo4j.csv.
-2025-11-18 20:05:46,349 - INFO - AuraConnector: Loading CONTAINS Relations
-2025-11-18 20:05:46,409 - INFO - AuraConnector: Found 270 CONTAINS Relations In data/ready_for_neo4j/relations4neo4j.csv.
-2025-11-18 20:06:05,774 - INFO - AuraConnector: Connector's Driver Closed Successfully.
-2025-11-18 20:06:05,774 - ERROR - AuraConnector: 
-2025-11-18 20:06:05,774 - ERROR - Load process interrupted manually.
-2025-11-18 20:06:05,774 - WARNING - Loading stage interrupted manually.
+2025-11-19 15:04:29,947 - INFO - Logs file initialized.
+2025-11-19 15:04:30,127 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-11-19 15:04:30,128 - INFO - PubMed API: email used.
+2025-11-19 15:04:30,136 - INFO - PubMed API: loaded 36123 UIDs from cache.
+2025-11-19 15:04:30,136 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-11-19 15:04:30,136 - INFO - PubMed API: email used.
+2025-11-19 15:04:30,136 - INFO - PubMed API: no cache found, starting fresh.
+2025-11-19 15:04:31,109 - INFO - Starting loading stage.
+2025-11-19 15:04:31,960 - INFO - AuraConnector: Successfully Connected To Neo4j Aura.
+2025-11-19 15:04:31,962 - INFO - AuraConnector: Loading AMINO_ACID nodes
+2025-11-19 15:04:31,963 - INFO - AuraConnector: Loading ANATOMICAL_SYSTEM nodes
+2025-11-19 15:04:31,964 - INFO - AuraConnector: Loading CANCER nodes
+2025-11-19 15:04:31,965 - INFO - AuraConnector: Loading CELL nodes
+2025-11-19 15:04:31,966 - INFO - AuraConnector: Loading CELLULAR_COMPONENT nodes
+2025-11-19 15:04:31,966 - INFO - AuraConnector: Loading DEVELOPING_ANATOMICAL_STRUCTURE nodes
+2025-11-19 15:04:31,967 - INFO - AuraConnector: Loading GENE_OR_GENE_PRODUCT nodes
+2025-11-19 15:04:31,968 - INFO - AuraConnector: Loading IMMATERIAL_ANATOMICAL_ENTITY nodes
+2025-11-19 15:04:31,972 - INFO - AuraConnector: Loading MULTI_TISSUE_STRUCTURE nodes
+2025-11-19 15:04:31,974 - INFO - AuraConnector: Loading ORGAN nodes
+2025-11-19 15:04:31,975 - INFO - AuraConnector: Loading ORGANISM nodes
+2025-11-19 15:04:31,976 - INFO - AuraConnector: Loading ORGANISM_SUBDIVISION nodes
+2025-11-19 15:04:31,977 - INFO - AuraConnector: Loading ORGANISM_SUBSTANCE nodes
+2025-11-19 15:04:31,978 - INFO - AuraConnector: Loading PATHOLOGICAL_FORMATION nodes
+2025-11-19 15:04:31,979 - INFO - AuraConnector: Loading SIMPLE_CHEMICAL nodes
+2025-11-19 15:04:31,979 - INFO - AuraConnector: Loading TISSUE nodes
+2025-11-19 15:04:32,381 - INFO - AuraConnector: Found 260 AMINO_ACID Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,266 - INFO - AuraConnector: Found 977 TISSUE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,476 - INFO - AuraConnector: Found 349 IMMATERIAL_ANATOMICAL_ENTITY Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,555 - INFO - AuraConnector: Found 1032 MULTI_TISSUE_STRUCTURE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,615 - INFO - AuraConnector: Found 328 ORGANISM_SUBDIVISION Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,926 - INFO - AuraConnector: Found 22736 GENE_OR_GENE_PRODUCT Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:36,933 - INFO - AuraConnector: Found 13931 CANCER Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,243 - INFO - AuraConnector: Found 10791 SIMPLE_CHEMICAL Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,339 - INFO - AuraConnector: Found 7699 CELL Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,530 - INFO - AuraConnector: Found 4618 ORGANISM Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,686 - INFO - AuraConnector: Found 1736 CELLULAR_COMPONENT Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,805 - INFO - AuraConnector: Found 16 DEVELOPING_ANATOMICAL_STRUCTURE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:37,920 - INFO - AuraConnector: Found 998 ORGANISM_SUBSTANCE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:38,302 - INFO - AuraConnector: Found 146 ANATOMICAL_SYSTEM Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:39,195 - INFO - AuraConnector: Found 370 ORGAN Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:04:39,963 - INFO - AuraConnector: Found 1391 PATHOLOGICAL_FORMATION Nodes In data/ready_for_neo4j/entities4neo4j.csv.
+2025-11-19 15:08:11,131 - INFO - AuraConnector:Loaded Successfully
+2025-11-19 15:08:11,140 - INFO - AuraConnector: Loading PRODUCES relations
+2025-11-19 15:08:11,141 - INFO - AuraConnector: Loading CONTAINS relations
+2025-11-19 15:08:11,142 - INFO - AuraConnector: Loading BINDS relations
+2025-11-19 15:08:11,144 - INFO - AuraConnector: Loading REGULATES relations
+2025-11-19 15:08:11,145 - INFO - AuraConnector: Loading EXPRESSED_IN relations
+2025-11-19 15:08:11,146 - INFO - AuraConnector: Loading MUTATED_IN relations
+2025-11-19 15:08:11,150 - INFO - AuraConnector: Loading PART_OF relations
+2025-11-19 15:08:11,154 - INFO - AuraConnector: Loading LOCATED_IN relations
+2025-11-19 15:08:11,177 - INFO - AuraConnector: Loading ORIGIN_OF relations
+2025-11-19 15:08:11,181 - INFO - AuraConnector: Loading CONTAINS_COMPONENT relations
+2025-11-19 15:08:11,189 - INFO - AuraConnector: Loading SURROUNDS relations
+2025-11-19 15:08:11,201 - INFO - AuraConnector: Loading DEVELOPS_INTO relations
+2025-11-19 15:08:11,219 - INFO - AuraConnector: Found 270 CONTAINS Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,230 - INFO - AuraConnector: Found 44 PRODUCES Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,261 - INFO - AuraConnector: Loading ORIGINATES_FROM relations
+2025-11-19 15:08:11,324 - INFO - AuraConnector: Loading ARISES_FROM relations
+2025-11-19 15:08:11,356 - INFO - AuraConnector: Loading AFFECTS relations
+2025-11-19 15:08:11,372 - INFO - AuraConnector: Loading ASSOCIATED_WITH relations
+2025-11-19 15:08:11,379 - INFO - AuraConnector: Found 36 PART_OF Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,383 - INFO - AuraConnector: Loading DAMAGES relations
+2025-11-19 15:08:11,386 - INFO - AuraConnector: Found 780 BINDS Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,405 - INFO - AuraConnector: Loading BIOMARKER_FOR relations
+2025-11-19 15:08:11,413 - INFO - AuraConnector: Loading TOXIC_TO relations
+2025-11-19 15:08:11,423 - INFO - AuraConnector: Loading COMPONENT_OF relations
+2025-11-19 15:08:11,426 - INFO - AuraConnector: Found 2795 REGULATES Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,431 - INFO - AuraConnector: Loading SECRETED_BY relations
+2025-11-19 15:08:11,432 - INFO - AuraConnector: Found 375 MUTATED_IN Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,444 - INFO - AuraConnector: Found 11 ORIGIN_OF Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,445 - INFO - AuraConnector: Found 59 LOCATED_IN Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,452 - INFO - AuraConnector: Loading TREATS relations
+2025-11-19 15:08:11,485 - INFO - AuraConnector: Found 709 EXPRESSED_IN Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,498 - INFO - AuraConnector: Found 248 CONTAINS_COMPONENT Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,519 - INFO - AuraConnector: Found 9 SURROUNDS Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,572 - INFO - AuraConnector: Found 343 AFFECTS Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,572 - INFO - AuraConnector: Found 51 ORIGINATES_FROM Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,573 - INFO - AuraConnector: Found 15 DEVELOPS_INTO Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,597 - INFO - AuraConnector: Found 26 ARISES_FROM Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,625 - INFO - AuraConnector: Found 931 ASSOCIATED_WITH Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,632 - INFO - AuraConnector: Found 24 DAMAGES Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,658 - INFO - AuraConnector: Found 5 TOXIC_TO Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,685 - INFO - AuraConnector: Found 399 BIOMARKER_FOR Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,734 - INFO - AuraConnector: Found 15 SECRETED_BY Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,734 - INFO - AuraConnector: Found 903 TREATS Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:11,735 - INFO - AuraConnector: Found 66 COMPONENT_OF Relations In data/ready_for_neo4j/relations4neo4j.csv.
+2025-11-19 15:08:26,745 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=206, clientId=62] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=196, clientId=53]} on NODE_RELATIONSHIP_GROUP_DELETE(19223) because holders of that lock are waiting for ForsetiClient[transactionId=206, clientId=62].
+ Wait list:ExclusiveLock[
+Client[196] waits for [ForsetiClient[transactionId=202, clientId=58],ForsetiClient[transactionId=206, clientId=62]]]}
+2025-11-19 15:08:26,745 - WARNING - Transaction failed and will be retried in 1.1667453699170318s (ForsetiClient[transactionId=206, clientId=62] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=196, clientId=53]} on NODE_RELATIONSHIP_GROUP_DELETE(19223) because holders of that lock are waiting for ForsetiClient[transactionId=206, clientId=62].
+ Wait list:ExclusiveLock[
+Client[196] waits for [ForsetiClient[transactionId=202, clientId=58],ForsetiClient[transactionId=206, clientId=62]]])
+2025-11-19 15:08:29,556 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=202, clientId=58] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=202, clientId=58].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=202, clientId=58]]]}
+2025-11-19 15:08:29,556 - WARNING - Transaction failed and will be retried in 0.9704417380958056s (ForsetiClient[transactionId=202, clientId=58] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=202, clientId=58].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=202, clientId=58]]])
+2025-11-19 15:08:29,943 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=199, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=198, clientId=52]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=199, clientId=55].
+ Wait list:ExclusiveLock[
+Client[198] waits for [ForsetiClient[transactionId=192, clientId=32],ForsetiClient[transactionId=199, clientId=55],ForsetiClient[transactionId=191, clientId=43]]]}
+2025-11-19 15:08:29,944 - WARNING - Transaction failed and will be retried in 1.119987012315053s (ForsetiClient[transactionId=199, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=198, clientId=52]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=199, clientId=55].
+ Wait list:ExclusiveLock[
+Client[198] waits for [ForsetiClient[transactionId=192, clientId=32],ForsetiClient[transactionId=199, clientId=55],ForsetiClient[transactionId=191, clientId=43]]])
+2025-11-19 15:08:30,185 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=198, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=198, clientId=52].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=192, clientId=32],ForsetiClient[transactionId=198, clientId=52],ForsetiClient[transactionId=199, clientId=55]]]}
+2025-11-19 15:08:30,186 - WARNING - Transaction failed and will be retried in 1.0611993837195943s (ForsetiClient[transactionId=198, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=198, clientId=52].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=192, clientId=32],ForsetiClient[transactionId=198, clientId=52],ForsetiClient[transactionId=199, clientId=55]]])
+2025-11-19 15:08:30,246 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=192, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13007) because holders of that lock are waiting for ForsetiClient[transactionId=192, clientId=32].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=192, clientId=32]]]}
+2025-11-19 15:08:30,246 - WARNING - Transaction failed and will be retried in 0.920350611058414s (ForsetiClient[transactionId=192, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13007) because holders of that lock are waiting for ForsetiClient[transactionId=192, clientId=32].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=192, clientId=32]]])
+2025-11-19 15:08:30,544 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=211, clientId=67] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=211, clientId=67].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=193, clientId=49],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=211, clientId=67],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=204, clientId=60]]]}
+2025-11-19 15:08:30,544 - WARNING - Transaction failed and will be retried in 0.9942256381910443s (ForsetiClient[transactionId=211, clientId=67] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=211, clientId=67].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=193, clientId=49],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=211, clientId=67],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=204, clientId=60]]])
+2025-11-19 15:08:30,802 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=210, clientId=66] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13007) because holders of that lock are waiting for ForsetiClient[transactionId=210, clientId=66].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=210, clientId=66]]]}
+2025-11-19 15:08:30,802 - WARNING - Transaction failed and will be retried in 0.9644205705709147s (ForsetiClient[transactionId=210, clientId=66] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13007) because holders of that lock are waiting for ForsetiClient[transactionId=210, clientId=66].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=210, clientId=66]]])
+2025-11-19 15:08:32,339 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=193, clientId=49] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=200, clientId=56]} on NODE_RELATIONSHIP_GROUP_DELETE(9074) because holders of that lock are waiting for ForsetiClient[transactionId=193, clientId=49].
+ Wait list:ExclusiveLock[
+Client[200] waits for [ForsetiClient[transactionId=193, clientId=49],ForsetiClient[transactionId=194, clientId=50]]]}
+2025-11-19 15:08:32,339 - WARNING - Transaction failed and will be retried in 1.1958131573141841s (ForsetiClient[transactionId=193, clientId=49] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=200, clientId=56]} on NODE_RELATIONSHIP_GROUP_DELETE(9074) because holders of that lock are waiting for ForsetiClient[transactionId=193, clientId=49].
+ Wait list:ExclusiveLock[
+Client[200] waits for [ForsetiClient[transactionId=193, clientId=49],ForsetiClient[transactionId=194, clientId=50]]])
+2025-11-19 15:08:34,694 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=220, clientId=67] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=200, clientId=56]} on NODE_RELATIONSHIP_GROUP_DELETE(9074) because holders of that lock are waiting for ForsetiClient[transactionId=220, clientId=67].
+ Wait list:ExclusiveLock[
+Client[200] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=220, clientId=67],ForsetiClient[transactionId=-1, clientId=53]]]}
+2025-11-19 15:08:34,695 - WARNING - Transaction failed and will be retried in 2.387860862960177s (ForsetiClient[transactionId=220, clientId=67] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=200, clientId=56]} on NODE_RELATIONSHIP_GROUP_DELETE(9074) because holders of that lock are waiting for ForsetiClient[transactionId=220, clientId=67].
+ Wait list:ExclusiveLock[
+Client[200] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=220, clientId=67],ForsetiClient[transactionId=-1, clientId=53]]])
+2025-11-19 15:08:35,080 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=204, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=204, clientId=60].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=216, clientId=52],ForsetiClient[transactionId=204, clientId=60]]]}
+2025-11-19 15:08:35,080 - WARNING - Transaction failed and will be retried in 0.8068798672035742s (ForsetiClient[transactionId=204, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=204, clientId=60].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=216, clientId=52],ForsetiClient[transactionId=204, clientId=60]]])
+2025-11-19 15:08:36,448 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=216, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=216, clientId=52].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=216, clientId=52],ForsetiClient[transactionId=195, clientId=30]]]}
+2025-11-19 15:08:36,448 - WARNING - Transaction failed and will be retried in 2.0373369160675936s (ForsetiClient[transactionId=216, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=216, clientId=52].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=216, clientId=52],ForsetiClient[transactionId=195, clientId=30]]])
+2025-11-19 15:08:37,341 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=195, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11452) because holders of that lock are waiting for ForsetiClient[transactionId=195, clientId=30].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=195, clientId=30]]]}
+2025-11-19 15:08:37,341 - WARNING - Transaction failed and will be retried in 0.9307686267209072s (ForsetiClient[transactionId=195, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11452) because holders of that lock are waiting for ForsetiClient[transactionId=195, clientId=30].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=195, clientId=30]]])
+2025-11-19 15:08:40,846 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=219, clientId=66] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11668) because holders of that lock are waiting for ForsetiClient[transactionId=219, clientId=66].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=219, clientId=66]]]}
+2025-11-19 15:08:40,846 - WARNING - Transaction failed and will be retried in 2.26239170417491s (ForsetiClient[transactionId=219, clientId=66] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11668) because holders of that lock are waiting for ForsetiClient[transactionId=219, clientId=66].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=219, clientId=66]]])
+2025-11-19 15:08:41,997 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=200, clientId=56] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=200, clientId=56].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=197, clientId=42]]]}
+2025-11-19 15:08:41,997 - WARNING - Transaction failed and will be retried in 0.9114637073105039s (ForsetiClient[transactionId=200, clientId=56] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=200, clientId=56].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=197, clientId=42]]])
+2025-11-19 15:08:42,006 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=197, clientId=42] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=209, clientId=65]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=197, clientId=42].
+ Wait list:ExclusiveLock[
+Client[209] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=197, clientId=42],ForsetiClient[transactionId=191, clientId=43]]]}
+2025-11-19 15:08:42,007 - WARNING - Transaction failed and will be retried in 0.8621579788802525s (ForsetiClient[transactionId=197, clientId=42] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=209, clientId=65]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=197, clientId=42].
+ Wait list:ExclusiveLock[
+Client[209] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=200, clientId=56],ForsetiClient[transactionId=197, clientId=42],ForsetiClient[transactionId=191, clientId=43]]])
+2025-11-19 15:08:42,155 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=208, clientId=64] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=209, clientId=65]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=208, clientId=64].
+ Wait list:ExclusiveLock[
+Client[209] waits for [ForsetiClient[transactionId=208, clientId=64],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=191, clientId=43]]]}
+2025-11-19 15:08:42,155 - WARNING - Transaction failed and will be retried in 0.9183745781704181s (ForsetiClient[transactionId=208, clientId=64] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=209, clientId=65]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=208, clientId=64].
+ Wait list:ExclusiveLock[
+Client[209] waits for [ForsetiClient[transactionId=208, clientId=64],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68],ForsetiClient[transactionId=191, clientId=43]]])
+2025-11-19 15:08:42,718 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=218, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11439) because holders of that lock are waiting for ForsetiClient[transactionId=218, clientId=32].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=218, clientId=32],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68]]]}
+2025-11-19 15:08:42,718 - WARNING - Transaction failed and will be retried in 2.0549638422737853s (ForsetiClient[transactionId=218, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11439) because holders of that lock are waiting for ForsetiClient[transactionId=218, clientId=32].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=218, clientId=32],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=212, clientId=68]]])
+2025-11-19 15:08:44,785 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=209, clientId=65] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13263) because holders of that lock are waiting for ForsetiClient[transactionId=209, clientId=65].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=217, clientId=55],ForsetiClient[transactionId=226, clientId=30]]]}
+2025-11-19 15:08:44,785 - WARNING - Transaction failed and will be retried in 0.8289671566615424s (ForsetiClient[transactionId=209, clientId=65] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13263) because holders of that lock are waiting for ForsetiClient[transactionId=209, clientId=65].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=209, clientId=65],ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=217, clientId=55],ForsetiClient[transactionId=226, clientId=30]]])
+2025-11-19 15:08:45,540 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=214, clientId=61] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=214, clientId=61].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=217, clientId=55],ForsetiClient[transactionId=214, clientId=61]]]}
+2025-11-19 15:08:45,541 - WARNING - Transaction failed and will be retried in 1.6969209653132242s (ForsetiClient[transactionId=214, clientId=61] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=214, clientId=61].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=217, clientId=55],ForsetiClient[transactionId=214, clientId=61]]])
+2025-11-19 15:08:45,839 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=217, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=217, clientId=55].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=217, clientId=55]]]}
+2025-11-19 15:08:45,839 - WARNING - Transaction failed and will be retried in 2.209742473670875s (ForsetiClient[transactionId=217, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=207, clientId=63]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=217, clientId=55].
+ Wait list:ExclusiveLock[
+Client[207] waits for [ForsetiClient[transactionId=217, clientId=55]]])
+2025-11-19 15:08:46,850 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=226, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=226, clientId=30].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=226, clientId=30]]]}
+2025-11-19 15:08:46,851 - WARNING - Transaction failed and will be retried in 2.127120657332749s (ForsetiClient[transactionId=226, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(9052) because holders of that lock are waiting for ForsetiClient[transactionId=226, clientId=30].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=226, clientId=30]]])
+2025-11-19 15:08:47,811 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=207, clientId=63] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(5825) because holders of that lock are waiting for ForsetiClient[transactionId=207, clientId=63].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=207, clientId=63]]]}
+2025-11-19 15:08:47,811 - WARNING - Transaction failed and will be retried in 0.8695747763288483s (ForsetiClient[transactionId=207, clientId=63] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=194, clientId=50]} on NODE_RELATIONSHIP_GROUP_DELETE(5825) because holders of that lock are waiting for ForsetiClient[transactionId=207, clientId=63].
+ Wait list:ExclusiveLock[
+Client[194] waits for [ForsetiClient[transactionId=207, clientId=63]]])
+2025-11-19 15:08:48,485 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=229, clientId=42] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11439) because holders of that lock are waiting for ForsetiClient[transactionId=229, clientId=42].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=229, clientId=42]]]}
+2025-11-19 15:08:48,485 - WARNING - Transaction failed and will be retried in 4.583430320502794s (ForsetiClient[transactionId=229, clientId=42] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11439) because holders of that lock are waiting for ForsetiClient[transactionId=229, clientId=42].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50],ForsetiClient[transactionId=229, clientId=42]]])
+2025-11-19 15:08:48,653 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=194, clientId=50] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11452) because holders of that lock are waiting for ForsetiClient[transactionId=194, clientId=50].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50]]]}
+2025-11-19 15:08:48,654 - WARNING - Transaction failed and will be retried in 0.8689185158896858s (ForsetiClient[transactionId=194, clientId=50] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11452) because holders of that lock are waiting for ForsetiClient[transactionId=194, clientId=50].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=194, clientId=50]]])
+2025-11-19 15:08:51,141 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=221, clientId=49] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(9462) because holders of that lock are waiting for ForsetiClient[transactionId=221, clientId=49].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=221, clientId=49],ForsetiClient[transactionId=224, clientId=60]]]}
+2025-11-19 15:08:51,141 - WARNING - Transaction failed and will be retried in 2.274258160803759s (ForsetiClient[transactionId=221, clientId=49] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(9462) because holders of that lock are waiting for ForsetiClient[transactionId=221, clientId=49].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=221, clientId=49],ForsetiClient[transactionId=224, clientId=60]]])
+2025-11-19 15:08:51,739 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=232, clientId=68] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=231, clientId=32]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=232, clientId=68].
+ Wait list:ExclusiveLock[
+Client[231] waits for [ForsetiClient[transactionId=232, clientId=68],ForsetiClient[transactionId=201, clientId=57]]]}
+2025-11-19 15:08:51,739 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=231, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(653) because holders of that lock are waiting for ForsetiClient[transactionId=231, clientId=32].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=231, clientId=32],ForsetiClient[transactionId=232, clientId=68]]]}
+2025-11-19 15:08:51,739 - WARNING - Transaction failed and will be retried in 3.494882359414193s (ForsetiClient[transactionId=232, clientId=68] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=231, clientId=32]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=232, clientId=68].
+ Wait list:ExclusiveLock[
+Client[231] waits for [ForsetiClient[transactionId=232, clientId=68],ForsetiClient[transactionId=201, clientId=57]]])
+2025-11-19 15:08:51,740 - WARNING - Transaction failed and will be retried in 3.5733294514777176s (ForsetiClient[transactionId=231, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(653) because holders of that lock are waiting for ForsetiClient[transactionId=231, clientId=32].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=231, clientId=32],ForsetiClient[transactionId=232, clientId=68]]])
+2025-11-19 15:08:52,136 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=224, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=224, clientId=60].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=224, clientId=60]]]}
+2025-11-19 15:08:52,136 - WARNING - Transaction failed and will be retried in 4.2494742860643s (ForsetiClient[transactionId=224, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11583) because holders of that lock are waiting for ForsetiClient[transactionId=224, clientId=60].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=224, clientId=60]]])
+2025-11-19 15:08:54,139 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=222, clientId=53] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=222, clientId=53].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=222, clientId=53]]]}
+2025-11-19 15:08:54,139 - WARNING - Transaction failed and will be retried in 4.60953383264803s (ForsetiClient[transactionId=222, clientId=53] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=222, clientId=53].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=222, clientId=53]]])
+2025-11-19 15:08:56,039 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=234, clientId=61] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7265) because holders of that lock are waiting for ForsetiClient[transactionId=234, clientId=61].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=203, clientId=59],ForsetiClient[transactionId=234, clientId=61]]]}
+2025-11-19 15:08:56,040 - WARNING - Transaction failed and will be retried in 4.264978921052564s (ForsetiClient[transactionId=234, clientId=61] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7265) because holders of that lock are waiting for ForsetiClient[transactionId=234, clientId=61].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=203, clientId=59],ForsetiClient[transactionId=234, clientId=61]]])
+2025-11-19 15:08:56,527 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=203, clientId=59] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7261) because holders of that lock are waiting for ForsetiClient[transactionId=203, clientId=59].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=203, clientId=59]]]}
+2025-11-19 15:08:56,528 - WARNING - Transaction failed and will be retried in 0.835123367182016s (ForsetiClient[transactionId=203, clientId=59] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7261) because holders of that lock are waiting for ForsetiClient[transactionId=203, clientId=59].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=203, clientId=59]]])
+2025-11-19 15:08:59,116 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=230, clientId=64] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13263) because holders of that lock are waiting for ForsetiClient[transactionId=230, clientId=64].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=230, clientId=64]]]}
+2025-11-19 15:08:59,117 - WARNING - Transaction failed and will be retried in 1.8662221221245452s (ForsetiClient[transactionId=230, clientId=64] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(13263) because holders of that lock are waiting for ForsetiClient[transactionId=230, clientId=64].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=230, clientId=64]]])
+2025-11-19 15:08:59,346 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=243, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(653) because holders of that lock are waiting for ForsetiClient[transactionId=243, clientId=60].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=225, clientId=52],ForsetiClient[transactionId=243, clientId=60]]]}
+2025-11-19 15:08:59,346 - WARNING - Transaction failed and will be retried in 6.7488551760269395s (ForsetiClient[transactionId=243, clientId=60] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(653) because holders of that lock are waiting for ForsetiClient[transactionId=243, clientId=60].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=225, clientId=52],ForsetiClient[transactionId=243, clientId=60]]])
+2025-11-19 15:08:59,740 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=225, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=225, clientId=52].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=225, clientId=52]]]}
+2025-11-19 15:08:59,741 - WARNING - Transaction failed and will be retried in 2.0036623284365676s (ForsetiClient[transactionId=225, clientId=52] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=225, clientId=52].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=225, clientId=52]]])
+2025-11-19 15:09:00,356 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=236, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7265) because holders of that lock are waiting for ForsetiClient[transactionId=236, clientId=30].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=236, clientId=30]]]}
+2025-11-19 15:09:00,357 - WARNING - Transaction failed and will be retried in 9.091323788804125s (ForsetiClient[transactionId=236, clientId=30] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=201, clientId=57]} on NODE_RELATIONSHIP_GROUP_DELETE(7265) because holders of that lock are waiting for ForsetiClient[transactionId=236, clientId=30].
+ Wait list:ExclusiveLock[
+Client[201] waits for [ForsetiClient[transactionId=236, clientId=30]]])
+2025-11-19 15:09:06,176 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=235, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11903) because holders of that lock are waiting for ForsetiClient[transactionId=235, clientId=55].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=235, clientId=55]]]}
+2025-11-19 15:09:06,176 - WARNING - Transaction failed and will be retried in 2.152815021247073s (ForsetiClient[transactionId=235, clientId=55] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11903) because holders of that lock are waiting for ForsetiClient[transactionId=235, clientId=55].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=235, clientId=55]]])
+2025-11-19 15:09:12,408 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=228, clientId=56] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11668) because holders of that lock are waiting for ForsetiClient[transactionId=228, clientId=56].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=228, clientId=56]]]}
+2025-11-19 15:09:12,648 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=237, clientId=63] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(9462) because holders of that lock are waiting for ForsetiClient[transactionId=237, clientId=63].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=237, clientId=63]]]}
+2025-11-19 15:09:37,497 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=251, clientId=64] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=191, clientId=43]} on NODE_RELATIONSHIP_GROUP_DELETE(11866) because holders of that lock are waiting for ForsetiClient[transactionId=251, clientId=64].
+ Wait list:ExclusiveLock[
+Client[191] waits for [ForsetiClient[transactionId=251, clientId=64],ForsetiClient[transactionId=247, clientId=42]]]}
+2025-11-19 15:10:24,508 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=246, clientId=68] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=213, clientId=62]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=246, clientId=68].
+ Wait list:ExclusiveLock[
+Client[213] waits for [ForsetiClient[transactionId=246, clientId=68]]]}
+2025-11-19 15:10:24,576 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=250, clientId=59] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=213, clientId=62]} on NODE_RELATIONSHIP_GROUP_DELETE(7260) because holders of that lock are waiting for ForsetiClient[transactionId=250, clientId=59].
+ Wait list:ExclusiveLock[
+Client[213] waits for [ForsetiClient[transactionId=250, clientId=59],ForsetiClient[transactionId=249, clientId=61]]]}
+2025-11-19 15:10:35,819 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=248, clientId=50] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=223, clientId=67]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=248, clientId=50].
+ Wait list:ExclusiveLock[
+Client[223] waits for [ForsetiClient[transactionId=248, clientId=50]]]}
+2025-11-19 15:10:40,789 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=244, clientId=53] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=223, clientId=67]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=244, clientId=53].
+ Wait list:ExclusiveLock[
+Client[223] waits for [ForsetiClient[transactionId=244, clientId=53]]]}
+2025-11-19 15:10:59,159 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=242, clientId=32] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=223, clientId=67]} on NODE_RELATIONSHIP_GROUP_DELETE(31512) because holders of that lock are waiting for ForsetiClient[transactionId=242, clientId=32].
+ Wait list:ExclusiveLock[
+Client[223] waits for [ForsetiClient[transactionId=242, clientId=32],ForsetiClient[transactionId=215, clientId=58]]]}
+2025-11-19 15:10:59,286 - ERROR - AuraConnector: Neo4j error: {code: Neo.TransientError.Transaction.DeadlockDetected} {message: ForsetiClient[transactionId=215, clientId=58] can't acquire ExclusiveLock{owner=ForsetiClient[transactionId=223, clientId=67]} on NODE_RELATIONSHIP_GROUP_DELETE(10591) because holders of that lock are waiting for ForsetiClient[transactionId=215, clientId=58].
+ Wait list:ExclusiveLock[
+Client[223] waits for [ForsetiClient[transactionId=215, clientId=58]]]}
