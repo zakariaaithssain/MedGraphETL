@@ -75,7 +75,7 @@ class Neo4jAuraConnector:
                             self._ents_batch_load(label, nodes_list=nodes_with_label, transaction= transaction)
                             transaction.commit()
                 except Exception as e:
-                    failed_to_load.append({"label" : label, "error" : str(e)})
+                    failed_to_load.append(label)
         
     #number of workers equals to the number of labels, a worker per label.
         with ThreadPoolExecutor(max_workers=len(labels_to_load)) as executor: 
@@ -96,16 +96,14 @@ class Neo4jAuraConnector:
         
         assert all(reltype in NEO4J_REL_TYPES for reltype in reltypes_to_load), f" {reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
         failed_to_load = []
+        
         def _combiner(reltype):
             logging.info(f"AuraConnector: Loading {reltype} relations")
             try: #one session per thread, combined with execute_write built-in to handle deadlocks
                 relations_with_reltype = self._get_relations_with_type(reltype, rels_clean_csv)
-                with self.driver.session() as session:
-                    session.execute_write(self._rels_batch_load,
-                                            reltype,
-                                            relations_with_reltype)
+                self._rels_batch_load(relation_type=reltype, relations_list=relations_with_reltype)
             except Exception as e: 
-                failed_to_load.append({"reltype":reltype, "error": str(e)})
+                failed_to_load.append(reltype)
 
     #number of workers equals to the number of relations types, a worker per type.
         with ThreadPoolExecutor(max_workers=len(reltypes_to_load)) as executor: 
@@ -150,7 +148,7 @@ class Neo4jAuraConnector:
             raise
 
     #1st arg after self should be a transaction (and it is injected by execute_write automatically)
-    def _rels_batch_load(self, transaction : Transaction, relation_type: str, relations_list: list[dict]):
+    def _rels_batch_load(self, relation_type: str, relations_list: list[dict]):
         """load relations to Neo4j using UNWIND bulk write
         Parameters:
         relation_type = "the relation type for the relations to load. (exp 'CAUSES')
@@ -170,13 +168,44 @@ class Neo4jAuraConnector:
                  }}
         """
         try: 
-            transaction.run(query, {"relations":relations_list})
+            #here the logic of batching to resolve the deadlocks
+            batches = self._create_non_conflicting_batches(relations_list)
+            for batch in batches:
+                with self.driver.session() as session:
+                    session.execute_write(
+                        lambda tx: tx.run(query, {"relations": batch})
+                        )
+                
         except Neo4jError as ne:
             logging.error(f"AuraConnector: Neo4j error: {ne}")
             raise
         except Exception as e:
             logging.error(f"AuraConnector: {e}")
             raise
+
+
+
+    #implement the algorithm of batching 
+    def _create_non_conflicting_batches(self, relations_list: list[dict]):
+        """create non conflicting batches to avoid deadlocks. returns a list of batches"""
+        while relations_list:
+            used_nodes = set()
+            new_batch = []
+            remaining_relations = []
+            for relation in relations_list:
+                src = relation['start_id']
+                dest = relation['end_id']
+
+                if src not in used_nodes and dest not in used_nodes:
+                    new_batch.append(relation)
+                    used_nodes.add(src)
+                    used_nodes.add(dest)
+                else: 
+                    remaining_relations.append(relation)
+
+            if new_batch: yield new_batch
+            relations_list = remaining_relations
+        
             
 
     
@@ -202,7 +231,6 @@ class Neo4jAuraConnector:
             raise
 
         if not entities.empty: 
-            logging.info(f"AuraConnector: Found {len(entities)} {label} Nodes In {ents_clean_csv}.")
             #format for Neo4j
             entities.rename(columns={":ID": "id"}, inplace=True, errors='ignore')
             #those will just create redundancy in the graph if kept
@@ -236,8 +264,6 @@ class Neo4jAuraConnector:
             raise
 
         if not relations.empty: 
-            logging.info(f"AuraConnector: Found {len(relations)} {type} Relations In {rels_clean_csv}.")
-
             #format for Neo4j
             relations.rename(columns={":ID": "id", ":START_ID": "start_id",":END_ID": "end_id"}, inplace=True, errors='ignore')
             #those will just create redundancy in the graph if kept
