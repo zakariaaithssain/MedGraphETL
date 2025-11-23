@@ -261,44 +261,73 @@ class Neo4jAuraConnector:
 
     def _create_connected_batches(self, relations_list: list[dict]):
         """
-        Yields batches where each batch contains relations belonging to the same connected component.
+        Yields batches where each batch contains relations belonging 
+        to the same connected component. Optimal O(N + R).
         """
+
+        # --------------------------
         # Step 1: Build adjacency list
+        # --------------------------
         adj = defaultdict(set)
+        nodes = set()
+
         for rel in relations_list:
             src = rel.get("start_id")
             dest = rel.get("end_id")
             if src is None or dest is None:
                 continue
+
             adj[src].add(dest)
-            adj[dest].add(src)  # undirected for component grouping
+            adj[dest].add(src)
 
-        # Step 2: Find connected components (nodes_dfS)
-        visited = set()
-        components = []
+            nodes.add(src)
+            nodes.add(dest)
 
-        for node in adj:
-            if node not in visited:
+        # --------------------------
+        # Step 2: DFS to label components
+        # --------------------------
+        component_of = {}        # node_id → component_id
+        comp_id = 0
+
+        for node in nodes:
+            if node not in component_of:
+                # start a new component
                 stack = [node]
-                comp_nodes = set()
+
                 while stack:
                     n = stack.pop()
-                    if n not in visited:
-                        visited.add(n)
-                        comp_nodes.add(n)
-                        stack.extend(adj[n] - visited)
-                components.append(comp_nodes)
+                    if n not in component_of:
+                        component_of[n] = comp_id
+                        stack.extend(adj[n])
 
-        # Step 3: Collect relations per component
-        for comp in components:
-            batch = [rel for rel in relations_list
-                    if rel.get("start_id") in comp or rel.get("end_id") in comp]
-            if batch:
-                yield batch
+                comp_id += 1
 
-        
+        # --------------------------
+        # Step 3: Assign relations to batches in one pass
+        # --------------------------
+        batches = defaultdict(list)  # comp_id → list of relations
+
+        for rel in relations_list:
+            src = rel.get("start_id")
+            dest = rel.get("end_id")
+            if src in component_of:
+                cid = component_of[src]
+            elif dest in component_of:
+                cid = component_of[dest]
+            else:
+                continue  # skip or create new batch for isolated stuff
+
+            batches[cid].append(rel)
+
+        # --------------------------
+        # Step 4: Yield the batches
+        # --------------------------
+        for batch in batches.values():
+            yield batch
 
             
 
-            
-            
+                
+
+                
+                
