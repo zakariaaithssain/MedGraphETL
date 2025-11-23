@@ -7,8 +7,10 @@ from neo4j import GraphDatabase, Transaction
 from neo4j.exceptions import Neo4jError, TransientError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from collections import defaultdict
 from tqdm import tqdm
 import logging
+import os 
 
 from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
@@ -76,9 +78,8 @@ class Neo4jAuraConnector:
 
                 except Exception as e:
                     logging.warning(f"AuraConnector: failed to load {label} nodes: {e}")
-        
-        #I am not specifiying the number of workers as that is causing some latency I guess.
-        with ThreadPoolExecutor() as executor: 
+        #this max workers is recommended by ChatGPT for I/O bound tasks
+        with ThreadPoolExecutor(min(100, os.cpu_count() * 4)) as executor: 
             futures = [executor.submit(_worker, label) for label in labels_to_load]
             for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): 
                 future.result()
@@ -158,31 +159,42 @@ class Neo4jAuraConnector:
             f"{reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
 
         all_relations = self._all_relations_list(rels_clean_csv)
-        #split into non conflicting batches to avoid deadlocks.
-        non_conflict_batches = self._create_non_conflicting_batches(all_relations)
-        try:
-            for batch in tqdm(non_conflict_batches, desc= "loading relations:", total= len(reltypes_to_load)):
-                for reltype in reltypes_to_load:
-                    self._load_relations_of_type(batch, reltype)
-            logging.info("AuraConnector: relations loaded successfully.")
-        except Exception as e: 
-            logging.error(f"AuraConnector:{e}")
-            raise
+        connexe_batches = self._create_connected_batches(all_relations)
+        
+        #this max workers is recommended by ChatGPT for I/O bound tasks
+        with ThreadPoolExecutor(min(100, os.cpu_count() * 4)) as executor:
+            futures = [executor.submit(self._relations_batch_load, batch, reltypes_to_load) 
+                       for batch in connexe_batches]
+            
+            for bcount, future in enumerate(tqdm(as_completed(futures), desc="loading relations:", total= len(futures))):
+                future.result()
+                logging.info(f"AuraConnector: loaded relations batch {bcount}")
+
+            else: logging.info("AuraConnector: loaded relations successfully.")
             
             
+    def _relations_batch_load(self, batch: list[dict], reltypes_to_load: list[str]):
+        "loads relations contained in the 'batch' if their Type appears in 'reltypes_to_load'."
+        for reltype in reltypes_to_load: 
+            self._load_relations_of_type(batch, reltype)
 
 
-    def _load_relations_of_type(self, relations_list: list, reltype: str):
+
+
+    def _load_relations_of_type(self, relations_list: list[dict], reltype: str):
+        """Loads relations from 'relations_list' of type 'reltype' to neo4j"""
         relations = self._get_relations_of_type(reltype, relations_list)
         try:
             with self.driver.session() as session:
                 session.execute_write(self._uow_write_rels, reltype, relations)
-        except TransientError as e:
-            logging.error(str(e))
+        #errors related to deadlocks
+        except TransientError as e: 
+            logging.error(f"AuraConnector: {e}")
             raise
         
-    #unity of work called by Neo4j's execute_write, the transaction variable
-    def _uow_write_rels(self, tx: Transaction, reltype: str, batch: list[dict]):
+    def _uow_write_rels(self, tx: Transaction, reltype: str, relations: list[dict]):
+            """unity of work called by neo4j's 'execute_write' method,
+              the tx variable is automatically assigned by neo4j's method."""
             query = f"""
             UNWIND $relations AS row
             MATCH (start {{id: row.start_id}})
@@ -193,39 +205,10 @@ class Neo4jAuraConnector:
                 pmcid: row.pmcid
             }}
             """
-            tx.run(query, {"relations": batch})
+            tx.run(query, {"relations": relations})
 
         
 
-
-    def _create_non_conflicting_batches(self, relations_list: list[dict]):
-        """
-        Yield batches such that no node id appears twice in the same batch.
-        This algorithm implementation is for preventing deadlocks when loading relations."""
-
-        remaining = list(relations_list)
-        while remaining:
-            used_nodes = set()
-            batch = []
-            next_remaining = []
-
-            for rel in remaining:
-                src = rel["start_id"]
-                dest = rel["end_id"]
-                if src is None or dest is None:
-                    continue
-
-                if src not in used_nodes and dest not in used_nodes:
-                    batch.append(rel)
-                    used_nodes.add(src)
-                    used_nodes.add(dest)
-                else:
-                    next_remaining.append(rel)
-
-            if batch: yield batch
-            remaining = next_remaining      
-
-    
     
     def _get_relations_of_type(self, reltype : str, relations_list: list[dict]):
         """ return list[dict] containing relations with 
@@ -238,6 +221,9 @@ class Neo4jAuraConnector:
         
         desired_relations = []
         for relation in relations_list:
+            #debugging
+            if not isinstance(relation, dict):
+                print("BAD RELATION:", relation, type(relation))
             if "type" in relation and relation['type'] == reltype:
                 desired_relations.append(relation)
         
@@ -247,6 +233,7 @@ class Neo4jAuraConnector:
 
     
     def _all_relations_list(self, rels_clean_csv: str) -> list[dict]:
+        """returns a list of dict, each dict represents a relation from the relations CSV file."""
         try: 
             df = pd.read_csv(rels_clean_csv)
         except FileNotFoundError as e:
@@ -261,7 +248,49 @@ class Neo4jAuraConnector:
             relations_list = df.to_dict("records")  #convert to list of dicts
             return relations_list
         else: return []
-        
+
+
+
+    def _create_connected_batches(self, relations_list: list[dict]):
+        """
+        Yields batches where each batch contains relations belonging to the same connected component.
+        """
+        # Step 1: Build adjacency list
+        adj = defaultdict(set)
+        for rel in relations_list:
+            src = rel.get("start_id")
+            dest = rel.get("end_id")
+            if src is None or dest is None:
+                continue
+            adj[src].add(dest)
+            adj[dest].add(src)  # undirected for component grouping
+
+        # Step 2: Find connected components (DFS)
+        visited = set()
+        components = []
+
+        for node in adj:
+            if node not in visited:
+                stack = [node]
+                comp_nodes = set()
+                while stack:
+                    n = stack.pop()
+                    if n not in visited:
+                        visited.add(n)
+                        comp_nodes.add(n)
+                        stack.extend(adj[n] - visited)
+                components.append(comp_nodes)
+
+        # Step 3: Collect relations per component
+        for comp in components:
+            batch = [rel for rel in relations_list
+                    if rel.get("start_id") in comp or rel.get("end_id") in comp]
+            if batch:
+                yield batch
 
         
-        
+
+            
+
+            
+            
