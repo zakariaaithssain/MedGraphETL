@@ -58,22 +58,23 @@ class Neo4jAuraConnector:
             logging.error(f"AuraConnector: {exception_value}")
         return False #don't supress errors
 
-    def load_ents_to_aura(self, labels_to_load : list[str], ents_clean_csv: str):
-        assert all(label in NEO4J_LABELS for label in labels_to_load), f"{labels_to_load} contains invalid label(s), valid: {NEO4J_LABELS}"
+    def load_ents_to_aura(self, labels_to_load : list[str], ents_clean_csv: str, only_related: bool, rels_clean_csv: str):
         """Load entities from the cleaned ents csv to Neo4j Aura. 
         Parameters:
             labels_to_load = list of the entities recognized by the NER model
             that we want to load. (exp: 'GENE')
-            ents_clean_csv = path of the cleaned ents csv."""
+            ents_clean_csv = path of the cleaned ents csv
+            only_related: if True, we only get labels that has some relation attached to them. 
+            rels_clean_csv = path to the relations cleaned csv"""
+        assert all(label in NEO4J_LABELS for label in labels_to_load), f"{labels_to_load} contains invalid label(s), valid: {NEO4J_LABELS}"
         
         def _worker(label):
             
-                try: #only one transaction per session, and one session per thread
+                try: #only one transaction per session
                     with self.driver.session() as session: 
                         with session.begin_transaction() as transaction: 
-                            nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv)
-                            self._ents_batch_load(label, nodes_list=nodes_with_label, transaction= transaction)
-                            transaction.commit()
+                            nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv, only_related, rels_clean_csv)
+                            self._ents_batch_load(label, nodes_batch=nodes_with_label, transaction= transaction)
                     logging.info(f"AuraConnector: loaded {label} nodes")
 
                 except Exception as e:
@@ -89,11 +90,11 @@ class Neo4jAuraConnector:
         
 
 
-    def _ents_batch_load(self, label: str, nodes_list: list[dict], transaction: Transaction):
-        """loads nodes to Neo4j using UNWIND bulk write
+    def _ents_batch_load(self, label: str, nodes_batch: list[dict], transaction: Transaction):
+        """loads nodes batch to Neo4j using UNWIND cypher operation, so all nodes in the batch should have the same label.
         Parameters:
         label = "the label for the nodes to load. (exp 'GENE')
-        nodes_list = list containing nodes to load, each is a dict, they must have the same label.
+        nodes_batch = list containing nodes to load, each is a dict, they must have the same label.
         transaction = neo4j transaction instance
 
         """
@@ -109,7 +110,8 @@ class Neo4jAuraConnector:
             }}
             """
         try: 
-            transaction.run(query, {"nodes":nodes_list})
+            transaction.run(query, {"nodes":nodes_batch})
+            transaction.commit()
         except Neo4jError as ne:
             logging.error(f"AuraConnector: Neo4j error: {ne}")
             raise
@@ -118,23 +120,29 @@ class Neo4jAuraConnector:
             raise
 
 
-    def _get_nodes_with_label(self, label : str, ents_clean_csv : str):
+    def _get_nodes_with_label(self, label : str, ents_clean_csv : str, only_related : bool, rels_clean_csv: str):
         """ return list[dict] containing rows with 
         the same label specified in the label argument, from the global cleaned
         csv that contains all extracted entities.
         Parameters: 
-                label = the label of the entities we wish to extract (exp. 'GENE') """
-        # Read and preprocess data
+                label = the label of the entities we wish to extract (exp. 'GENE')
+                ents_clean_csv = path to the entities cleaned csv
+                only_related: if True, we only get labels that has some relation attached to them. 
+                rels_clean_csv = path to the relations cleaned csv"""
         assert label in NEO4J_LABELS, f"label argument got {label}, not one of {NEO4J_LABELS}."
         try: 
-            df = pd.read_csv(ents_clean_csv,
+            nodes_df = pd.read_csv(ents_clean_csv,
                               dtype = {6:str, 7:str, 8:str, 9:str}) #to fix a DtypeWarning 
-        except FileNotFoundError as e:
+            if only_related:
+                rels_df = pd.read_csv(rels_clean_csv)
+                related_nodes = set(rels_df[':START_ID']) | set(rels_df[':END_ID'])
+                nodes_df = nodes_df[nodes_df[':ID'].isin(related_nodes)]
+        except Exception as e:
             logging.error(f"AuraConnector: {e}")
             raise
         
         try:
-            entities = df[df[":LABEL"] == label].copy()
+            entities = nodes_df[nodes_df[":LABEL"] == label].copy()
         except KeyError as e:
             logging.error(f"AuraConnector: {e}. Perhaps You Changed ':LABEL' To Something Else During Cleaning?" )
             raise
@@ -235,17 +243,17 @@ class Neo4jAuraConnector:
     def _all_relations_list(self, rels_clean_csv: str) -> list[dict]:
         """returns a list of dict, each dict represents a relation from the relations CSV file."""
         try: 
-            df = pd.read_csv(rels_clean_csv)
+            nodes_df = pd.read_csv(rels_clean_csv)
         except FileNotFoundError as e:
             logging.error(f"AuraConnector: {e}")
             raise
 
-        if not df.empty: 
-            df.rename(columns={":ID": "id", ":START_ID": "start_id",":END_ID": "end_id", ":TYPE" : "type"}, inplace=True, errors='ignore')
+        if not nodes_df.empty: 
+            nodes_df.rename(columns={":ID": "id", ":START_ID": "start_id",":END_ID": "end_id", ":TYPE" : "type"}, inplace=True, errors='ignore')
             #those will just create redundancy in the graph if kept
-            to_drop = [col for col in ["pmid", "fetching_date"] if col in df.columns]
-            df.drop(columns=to_drop, inplace=True)
-            relations_list = df.to_dict("records")  #convert to list of dicts
+            to_drop = [col for col in ["pmid", "fetching_date"] if col in nodes_df.columns]
+            nodes_df.drop(columns=to_drop, inplace=True)
+            relations_list = nodes_df.to_dict("records")  #convert to list of dicts
             return relations_list
         else: return []
 
@@ -265,7 +273,7 @@ class Neo4jAuraConnector:
             adj[src].add(dest)
             adj[dest].add(src)  # undirected for component grouping
 
-        # Step 2: Find connected components (DFS)
+        # Step 2: Find connected components (nodes_dfS)
         visited = set()
         components = []
 
