@@ -4,7 +4,7 @@
 import pandas as pd
 
 from neo4j import GraphDatabase, Transaction
-from neo4j.exceptions import Neo4jError
+from neo4j.exceptions import Neo4jError, TransientError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from tqdm import tqdm
@@ -63,62 +63,31 @@ class Neo4jAuraConnector:
             labels_to_load = list of the entities recognized by the NER model
             that we want to load. (exp: 'GENE')
             ents_clean_csv = path of the cleaned ents csv."""
-        failed_to_load = [] #will contain labels that weren't able to be loaded.
         
-        def _combiner(label):
+        def _worker(label):
             
-                logging.info(f"AuraConnector: Loading {label} nodes")
                 try: #only one transaction per session, and one session per thread
                     with self.driver.session() as session: 
                         with session.begin_transaction() as transaction: 
                             nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv)
                             self._ents_batch_load(label, nodes_list=nodes_with_label, transaction= transaction)
                             transaction.commit()
+                    logging.info(f"AuraConnector: loaded {label} nodes")
+
                 except Exception as e:
-                    failed_to_load.append(label)
+                    logging.warning(f"AuraConnector: failed to load {label} nodes: {e}")
         
-    #number of workers equals to the number of labels, a worker per label.
-        with ThreadPoolExecutor(max_workers=len(labels_to_load)) as executor: 
-            futures = [executor.submit(_combiner, label) for label in labels_to_load]
+        #I am not specifiying the number of workers as that is causing some latency I guess.
+        with ThreadPoolExecutor() as executor: 
+            futures = [executor.submit(_worker, label) for label in labels_to_load]
             for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): 
                 future.result()
+            else: 
+                logging.info("AuraConnector: loaded nodes successfully.")
 
-        if failed_to_load: logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
-        else: logging.info("AuraConnector:Loaded Successfully")
-
-    
-    def load_rels_to_aura(self, reltypes_to_load : list[str], rels_clean_csv: str):
-        """Load entities from the cleaned rels csv to Neo4j Aura. 
-        Parameters:
-            labels_to_load = list of the entities recognized by the NER model
-            that we want to load. (exp: 'GENE')
-            rels_clean_csv = path of the cleaned rels csv."""
         
-        assert all(reltype in NEO4J_REL_TYPES for reltype in reltypes_to_load), f" {reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
-        failed_to_load = []
-        
-        def _combiner(reltype):
-            logging.info(f"AuraConnector: Loading {reltype} relations")
-            try: #one session per thread, combined with execute_write built-in to handle deadlocks
-                relations_with_reltype = self._get_relations_with_type(reltype, rels_clean_csv)
-                self._rels_batch_load(relation_type=reltype, relations_list=relations_with_reltype)
-            except Exception as e: 
-                failed_to_load.append(reltype)
-
-    #number of workers equals to the number of relations types, a worker per type.
-        with ThreadPoolExecutor(max_workers=len(reltypes_to_load)) as executor: 
-            futures = [executor.submit(_combiner, reltype) for reltype in reltypes_to_load]
-            for future in tqdm(futures, desc="loading relations:", total=len(reltypes_to_load)):
-                future.result()
-
-        if failed_to_load: 
-            logging.error(f"AuraConnector: Failed To Load: {failed_to_load}")
-        else: 
-            logging.info(f"AuraConnector: Loaded Successfully.")
 
 
-
-  
     def _ents_batch_load(self, label: str, nodes_list: list[dict], transaction: Transaction):
         """loads nodes to Neo4j using UNWIND bulk write
         Parameters:
@@ -147,68 +116,7 @@ class Neo4jAuraConnector:
             logging.error(f"AuraConnector: {e}")
             raise
 
-    #1st arg after self should be a transaction (and it is injected by execute_write automatically)
-    def _rels_batch_load(self, relation_type: str, relations_list: list[dict]):
-        """load relations to Neo4j using UNWIND bulk write
-        Parameters:
-        relation_type = "the relation type for the relations to load. (exp 'CAUSES')
-        relations_list: list containing relations to load, each is a dict, they must have the same type
-        transaction: neo4j transaction instance
 
-        """
-        
-        query = f"""
-        UNWIND $relations AS row
-        MATCH (start {{id: row.start_id}})
-        MATCH (end {{id: row.end_id}})
-        MERGE (start)-[r:{relation_type}]->(end)
-        SET r += {{
-        pmid: row.pmid,
-        pmcid: row.pmcid
-                 }}
-        """
-        try: 
-            #here the logic of batching to resolve the deadlocks
-            batches = self._create_non_conflicting_batches(relations_list)
-            for batch in batches:
-                with self.driver.session() as session:
-                    session.execute_write(
-                        lambda tx: tx.run(query, {"relations": batch})
-                        )
-                
-        except Neo4jError as ne:
-            logging.error(f"AuraConnector: Neo4j error: {ne}")
-            raise
-        except Exception as e:
-            logging.error(f"AuraConnector: {e}")
-            raise
-
-
-
-    #implement the algorithm of batching 
-    def _create_non_conflicting_batches(self, relations_list: list[dict]):
-        """create non conflicting batches to avoid deadlocks. returns a list of batches"""
-        while relations_list:
-            used_nodes = set()
-            new_batch = []
-            remaining_relations = []
-            for relation in relations_list:
-                src = relation['start_id']
-                dest = relation['end_id']
-
-                if src not in used_nodes and dest not in used_nodes:
-                    new_batch.append(relation)
-                    used_nodes.add(src)
-                    used_nodes.add(dest)
-                else: 
-                    remaining_relations.append(relation)
-
-            if new_batch: yield new_batch
-            relations_list = remaining_relations
-        
-            
-
-    
     def _get_nodes_with_label(self, label : str, ents_clean_csv : str):
         """ return list[dict] containing rows with 
         the same label specified in the label argument, from the global cleaned
@@ -242,37 +150,118 @@ class Neo4jAuraConnector:
             logging.warning(f"AuraConnector: No {label} Nodes In {ents_clean_csv}.")
             return []
         
-    def _get_relations_with_type(self, type : str, rels_clean_csv : str):
+
+
+    
+    def load_rels_to_aura(self, reltypes_to_load: list[str], rels_clean_csv: str):
+        assert all(rt in NEO4J_REL_TYPES for rt in reltypes_to_load), \
+            f"{reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
+
+        all_relations = self._all_relations_list(rels_clean_csv)
+        #split into non conflicting batches to avoid deadlocks.
+        non_conflict_batches = self._create_non_conflicting_batches(all_relations)
+        try:
+            for batch in tqdm(non_conflict_batches, desc= "loading relations:", total= len(reltypes_to_load)):
+                for reltype in reltypes_to_load:
+                    self._load_relations_of_type(batch, reltype)
+            logging.info("AuraConnector: relations loaded successfully.")
+        except Exception as e: 
+            logging.error(f"AuraConnector:{e}")
+            raise
+            
+            
+
+
+    def _load_relations_of_type(self, relations_list: list, reltype: str):
+        relations = self._get_relations_of_type(reltype, relations_list)
+        try:
+            with self.driver.session() as session:
+                session.execute_write(self._uow_write_rels, reltype, relations)
+        except TransientError as e:
+            logging.error(str(e))
+            raise
+        
+    #unity of work called by Neo4j's execute_write, the transaction variable
+    def _uow_write_rels(self, tx: Transaction, reltype: str, batch: list[dict]):
+            query = f"""
+            UNWIND $relations AS row
+            MATCH (start {{id: row.start_id}})
+            MATCH (end {{id: row.end_id}})
+            MERGE (start)-[r:{reltype}]->(end)
+            SET r += {{
+                pmid: row.pmid,
+                pmcid: row.pmcid
+            }}
+            """
+            tx.run(query, {"relations": batch})
+
+        
+
+
+    def _create_non_conflicting_batches(self, relations_list: list[dict]):
+        """
+        Yield batches such that no node id appears twice in the same batch.
+        This algorithm implementation is for preventing deadlocks when loading relations."""
+
+        remaining = list(relations_list)
+        while remaining:
+            used_nodes = set()
+            batch = []
+            next_remaining = []
+
+            for rel in remaining:
+                src = rel["start_id"]
+                dest = rel["end_id"]
+                if src is None or dest is None:
+                    continue
+
+                if src not in used_nodes and dest not in used_nodes:
+                    batch.append(rel)
+                    used_nodes.add(src)
+                    used_nodes.add(dest)
+                else:
+                    next_remaining.append(rel)
+
+            if batch: yield batch
+            remaining = next_remaining      
+
+    
+    
+    def _get_relations_of_type(self, reltype : str, relations_list: list[dict]):
         """ return list[dict] containing relations with 
-        the same type specified in the type argument, from the global cleaned
-        csv that contains all extracted relations.
+        the same type specified in the type argument, from the list of relations
         Parameters: 
                 type = the type of the relations we wish to extract (exp. 'AFFECTS')
-                 rels_clean_csv = the csv containing the cleaned relations."""
+                relations_list = the list containing all the extracted relations."""
         
-        assert type in NEO4J_REL_TYPES, f"type argument got {type}, not one of {NEO4J_REL_TYPES}."
+        assert reltype in NEO4J_REL_TYPES, f"'type' argument got {reltype}, not one of {NEO4J_REL_TYPES}."
+        
+        desired_relations = []
+        for relation in relations_list:
+            if "type" in relation and relation['type'] == reltype:
+                desired_relations.append(relation)
+        
+        return desired_relations
+    
+
+
+    
+    def _all_relations_list(self, rels_clean_csv: str) -> list[dict]:
         try: 
             df = pd.read_csv(rels_clean_csv)
         except FileNotFoundError as e:
             logging.error(f"AuraConnector: {e}")
             raise
-        
-        try:
-            relations = df[df[":TYPE"] == type].copy()
-        except KeyError as e:
-            logging.error(f"AuraConnector: {e}. Perhaps You Changed ':TYPE' To Something Else During Cleaning?" )
-            raise
 
-        if not relations.empty: 
-            #format for Neo4j
-            relations.rename(columns={":ID": "id", ":START_ID": "start_id",":END_ID": "end_id"}, inplace=True, errors='ignore')
+        if not df.empty: 
+            df.rename(columns={":ID": "id", ":START_ID": "start_id",":END_ID": "end_id", ":TYPE" : "type"}, inplace=True, errors='ignore')
             #those will just create redundancy in the graph if kept
-            to_drop = [col for col in [":TYPE", "pmid", "pmcid", "fetching_date"] if col in relations.columns]
-            relations.drop(columns=to_drop, inplace=True)
-            relations_dict = relations.to_dict("records")  #convert to list of dicts
-            return relations_dict
-        else:
-            logging.warning(f"AuraConnector: No {type} Relations In {rels_clean_csv}.")
-            return []
+            to_drop = [col for col in ["pmid", "fetching_date"] if col in df.columns]
+            df.drop(columns=to_drop, inplace=True)
+            relations_list = df.to_dict("records")  #convert to list of dicts
+            return relations_list
+        else: return []
+        
+
         
         
