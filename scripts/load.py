@@ -9,7 +9,7 @@ from config.secrets import NEO4J_AUTH, NEO4J_URI
 
 def load_to_aura(labels_to_load:Optional[list[str]] = None,
                 ents_clean_csv:Optional[str]= None,
-
+                only_related: bool = True, 
                 reltypes_to_load:Optional[list[str]] = None,
                 rels_clean_csv:Optional[str] = None,
 
@@ -27,7 +27,7 @@ def load_to_aura(labels_to_load:Optional[list[str]] = None,
                                     auth=NEO4J_AUTH,
                                     load_batch_size=load_batch_size) as connector:
                 if nodes_args_provided:
-                    connector.load_ents_to_aura(labels_to_load, ents_clean_csv)
+                    connector.load_ents_to_aura(labels_to_load, ents_clean_csv, only_related, rels_clean_csv)
                 
                 if rels_args_provided: 
                     connector.load_rels_to_aura(reltypes_to_load, rels_clean_csv)
