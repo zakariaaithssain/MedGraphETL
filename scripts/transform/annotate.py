@@ -51,7 +51,7 @@ def annotate_mongo_articles(ents_path ="data/extracted_entities.csv", rels_path 
     try:
         with ProcessPoolExecutor() as executor: 
             futures = [executor.submit(combiner, article.pop('text'), article) 
-                       for article in tqdm(articles, desc= "submitting futures:")]
+                       for article in articles]
             for future in tqdm(futures, desc="Applying NLP over Mongo docs:"): future.result()
         # for article in tqdm(articles, desc="Applying NLP over Mongo docs:"):
         #     text = article.pop('text')
