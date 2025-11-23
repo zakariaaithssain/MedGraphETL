@@ -21,7 +21,7 @@ def timer(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         end = time.perf_counter()
-        print(f"{func.__name__} took {end - start:.6f} seconds")
+        print(f"with normalization cache, {func.__name__} took {end - start:.6f} seconds")
         return result
     return wrapper
 
@@ -271,10 +271,10 @@ No Flags Examples:
         print(f"Unexpected error: {e}")
         logging.exception("Unexpected error occurred")
     
-    # Exit with appropriate code
-    sys.exit(0 if success else 1)
+   
 
 
 
 if __name__ == "__main__":
-    main()
+    success = main()
+    sys.exit(0 if success else 1)
