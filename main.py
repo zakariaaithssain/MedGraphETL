@@ -1,6 +1,7 @@
 import logging
 import argparse
 import sys
+import time
 
 from scripts.extract import extract_pubmed_to_mongo
 from scripts.transform.annotate import annotate_mongo_articles
@@ -8,6 +9,23 @@ from scripts.transform.clean import prepare_data_for_neo4j
 from scripts.load import load_to_aura
 
 from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
+
+
+#TODO: CHECK THAT CLI ARGS SUPPORT ALL AVAILABLE OPTIONS, AND NO LONGER CONTAIN UNSUPPORTED ONES.
+
+
+
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        print(f"{func.__name__} took {end - start:.6f} seconds")
+        return result
+    return wrapper
+
+
 
 def extract_stage(article_content: bool = False,
                     max_results: int = None,
@@ -161,7 +179,7 @@ def run_etl(article_content: bool = False,
         return False
 
 
-
+@timer
 def main():
     """Main entry point with CLI argument parsing."""
     parser = argparse.ArgumentParser(
