@@ -3,7 +3,6 @@ import pandas as pd
 import uuid
 import logging
 import os
-#TODO: consider removing duplicated entities even if they are from different articles. 
 #TODO: consider removing the pmid, pmcid and fetching date from entities before cleaning them
 # because of them we will have redudent entities bla fayda. (keep pmid and pmcid for relations)
 def prepare_data_for_neo4j(raw_ents_path, raw_rels_path, saving_dir):
@@ -11,6 +10,7 @@ def prepare_data_for_neo4j(raw_ents_path, raw_rels_path, saving_dir):
 	raw_ents_path = path to the raw extracted entities csv
 	raw_rels_path = path to raw extracted relations csv
 	saving_dir = path of the directory to which cleaned data will be saved"""
+
 	entities = pd.read_csv(raw_ents_path)
 	relations = pd.read_csv(raw_rels_path)
 
@@ -38,6 +38,8 @@ def prepare_data_for_neo4j(raw_ents_path, raw_rels_path, saving_dir):
 	logging.info("Entities: Drop ['text'] Duplicates.")
 	print("entities records after:", entities.shape[0])
 	logging.info(f"Entities: After Cleaning: {len(entities)}")
+
+	
 	#relations cleaning
 	print("relations records before:", relations.shape[0])
 	logging.info(f"Relations: Before Cleaning: {len(relations)}")

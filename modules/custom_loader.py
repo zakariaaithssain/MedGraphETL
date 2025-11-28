@@ -265,9 +265,7 @@ class Neo4jAuraConnector:
         to the same connected component. Optimal O(N + R).
         """
 
-        # --------------------------
-        # Step 1: Build adjacency list
-        # --------------------------
+        #1-build adjacency list
         adj = defaultdict(set)
         nodes = set()
 
@@ -283,10 +281,8 @@ class Neo4jAuraConnector:
             nodes.add(src)
             nodes.add(dest)
 
-        # --------------------------
-        # Step 2: DFS to label components
-        # --------------------------
-        component_of = {}        # node_id → component_id
+        #2-DFS to label components
+        component_of = {}   
         comp_id = 0
 
         for node in nodes:
@@ -302,10 +298,8 @@ class Neo4jAuraConnector:
 
                 comp_id += 1
 
-        # --------------------------
-        # Step 3: Assign relations to batches in one pass
-        # --------------------------
-        batches = defaultdict(list)  # comp_id → list of relations
+        #3-assign relations to batches in one pass
+        batches = defaultdict(list)  
 
         for rel in relations_list:
             src = rel.get("start_id")
@@ -315,13 +309,11 @@ class Neo4jAuraConnector:
             elif dest in component_of:
                 cid = component_of[dest]
             else:
-                continue  # skip or create new batch for isolated stuff
+                continue  #skip or create new batch for isolated stuff
 
             batches[cid].append(rel)
 
-        # --------------------------
-        # Step 4: Yield the batches
-        # --------------------------
+        #finally yield batches
         for batch in batches.values():
             yield batch
 

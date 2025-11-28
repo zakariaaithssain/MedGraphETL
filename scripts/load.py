@@ -2,7 +2,7 @@ from typing import Optional
 
 import logging
 
-from modules.neo4jaura import Neo4jAuraConnector
+from modules.custom_loader import Neo4jAuraConnector
 from config.secrets import NEO4J_AUTH, NEO4J_URI
 
 
