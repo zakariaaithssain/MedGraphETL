@@ -1,6 +1,10 @@
 #etl
-.env/
+#I named the venv .graph/
 .graph/
+#secrets
+.env
+*.env
+
 __pycache__/
 .vscode/
 extracted_entities.csv
