@@ -1,0 +1,53 @@
+2025-12-08 11:54:43,241 - INFO - Logs file initialized.
+2025-12-08 11:54:43,602 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-08 11:54:43,603 - INFO - PubMed API: email used.
+2025-12-08 11:54:43,617 - INFO - PubMed API: loaded 36132 UIDs from cache.
+2025-12-08 11:54:43,617 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-08 11:54:43,617 - INFO - PubMed API: email used.
+2025-12-08 11:54:43,617 - INFO - PubMed API: no cache found, starting fresh.
+2025-12-08 11:54:45,031 - INFO - Starting extraction stage.
+2025-12-08 11:54:45,031 - INFO - Extraction Process: searching UIDs of articles found for each query.
+2025-12-08 11:54:45,031 - WARNING - PubMed API: For 'pubmed' database, ESearch Endpoint is built to only retrieve the first 10,000 records matching the query. To get more, either specify another database or use EDirect (a CLI). See PubMed API documentation for more info.
+2025-12-08 11:54:46,778 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:46,779 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:46,781 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:46,782 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:46,811 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:46,811 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:46,834 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:46,834 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:47,533 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:47,533 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:47,565 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:47,565 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:47,567 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:47,567 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:47,854 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-08 11:54:47,854 - INFO - search endpoint sleeping for 0.11s.
+2025-12-08 11:54:47,968 - INFO - Extraction Process: only articles abstracts and metadata will be fetched.
+2025-12-08 11:54:47,971 - INFO - PubMed API: 0 new UIDs articles to fetch.
+2025-12-08 11:54:47,988 - INFO - PubMed API: saved 36132 UIDs back to cache.
+2025-12-08 11:54:57,721 - INFO - AtlasConnector: deployment pinged. Successfully connected to MongoDB Atlas.
+2025-12-08 11:54:57,721 - INFO - AtlasConnector: Cluster: articles-cluster.
+2025-12-08 11:54:57,721 - INFO - AtlasConnector: DataBase: fetched-data-db.
+2025-12-08 11:54:57,721 - INFO - AtlasConnector: Collection: pm-pmc-data.
+2025-12-08 11:54:57,762 - INFO - AtlasConnector: inserting new docs, already present or empty ones are ignored.
+2025-12-08 11:54:57,770 - INFO - AtlasConnector: articles inserted successfully to MongoDB Atlas.
+2025-12-08 11:54:57,809 - INFO - AtlasConnector: connection closed.
+2025-12-08 11:54:57,809 - INFO - Extraction stage completed.
+2025-12-08 11:54:57,809 - INFO - Starting annotation stage.
+2025-12-08 11:54:58,229 - INFO - AtlasConnector: deployment pinged. Successfully connected to MongoDB Atlas.
+2025-12-08 11:54:58,229 - INFO - AtlasConnector: Cluster: articles-cluster.
+2025-12-08 11:54:58,229 - INFO - AtlasConnector: DataBase: fetched-data-db.
+2025-12-08 11:54:58,230 - INFO - AtlasConnector: Collection: pm-pmc-data.
+2025-12-08 11:54:58,268 - INFO - AtlasConnector: fetching docs from MongoDB Atlas.
+2025-12-08 11:56:23,716 - INFO - AtlasConnector: articles fetched successfully from MongoDB Atlas.
+2025-12-08 11:56:23,716 - INFO - Annotation Process Started.
+2025-12-08 11:56:23,900 - INFO - Normalizer: Initialized.
+2025-12-08 11:56:23,902 - INFO - Normalizer: Initialized.
+2025-12-08 11:56:23,906 - INFO - NLP: Loading NER Model...
+2025-12-08 11:56:23,910 - INFO - Normalizer: Initialized.
+2025-12-08 11:56:23,920 - INFO - NLP: Loading NER Model...
+2025-12-08 11:56:23,904 - INFO - Normalizer: Initialized.
+2025-12-08 11:56:23,934 - INFO - NLP: Loading NER Model...
+2025-12-08 11:56:23,958 - INFO - NLP: Loading NER Model...
