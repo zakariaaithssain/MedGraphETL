@@ -11,7 +11,7 @@ __pycache__/
 .vscode/
 extracted_entities.csv
 extracted_relations.csv
-
+README_COMPLETE.md
 
 
 #frontend
@@ -52,3 +52,4 @@ next-env.d.ts
 
 node_modules/
 .next/
+

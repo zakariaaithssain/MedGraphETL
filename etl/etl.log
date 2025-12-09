@@ -1,43 +1,9 @@
-2025-12-09 15:03:23,239 - INFO - Logs file initialized.
-2025-12-09 15:03:23,699 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-09 15:03:23,700 - INFO - PubMed API: email used.
-2025-12-09 15:03:23,716 - INFO - PubMed API: loaded 36132 UIDs from cache.
-2025-12-09 15:03:23,717 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-09 15:03:23,717 - INFO - PubMed API: email used.
-2025-12-09 15:03:23,717 - INFO - PubMed API: no cache found, starting fresh.
-2025-12-09 15:03:26,025 - INFO - Starting loading stage.
-2025-12-09 15:03:30,025 - INFO - AuraConnector: Successfully Connected To Neo4j Aura.
-2025-12-09 15:03:35,473 - INFO - AuraConnector: loaded ORGANISM nodes
-2025-12-09 15:03:35,521 - WARNING - AuraConnector: No DEVELOPING_ANATOMICAL_STRUCTURE Nodes In data/ready_for_neo4j/entities4neo4j.csv.
-2025-12-09 15:03:35,521 - INFO - AuraConnector: loaded CELLULAR_COMPONENT nodes
-2025-12-09 15:03:35,576 - INFO - AuraConnector: loaded PATHOLOGICAL_FORMATION nodes
-2025-12-09 15:03:35,657 - INFO - AuraConnector: loaded ORGAN nodes
-2025-12-09 15:03:35,693 - INFO - AuraConnector: loaded DEVELOPING_ANATOMICAL_STRUCTURE nodes
-2025-12-09 15:03:35,700 - INFO - AuraConnector: loaded IMMATERIAL_ANATOMICAL_ENTITY nodes
-2025-12-09 15:03:35,707 - INFO - AuraConnector: loaded MULTI_TISSUE_STRUCTURE nodes
-2025-12-09 15:03:35,799 - INFO - AuraConnector: loaded AMINO_ACID nodes
-2025-12-09 15:03:35,805 - INFO - AuraConnector: loaded TISSUE nodes
-2025-12-09 15:03:35,853 - INFO - AuraConnector: loaded ANATOMICAL_SYSTEM nodes
-2025-12-09 15:03:35,913 - INFO - AuraConnector: loaded CELL nodes
-2025-12-09 15:03:35,956 - INFO - AuraConnector: loaded ORGANISM_SUBDIVISION nodes
-2025-12-09 15:03:35,986 - INFO - AuraConnector: loaded ORGANISM_SUBSTANCE nodes
-2025-12-09 15:03:37,259 - INFO - AuraConnector: loaded CANCER nodes
-2025-12-09 15:03:37,310 - INFO - AuraConnector: loaded SIMPLE_CHEMICAL nodes
-2025-12-09 15:03:43,553 - INFO - AuraConnector: loaded GENE_OR_GENE_PRODUCT nodes
-2025-12-09 15:03:43,553 - INFO - AuraConnector: loaded nodes successfully.
-2025-12-09 15:03:51,023 - WARNING - Transaction failed and will be retried in 0.9828624169109643s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,024 - WARNING - Transaction failed and will be retried in 0.9245598108616939s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,026 - WARNING - Transaction failed and will be retried in 1.0444274203004167s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,028 - WARNING - Transaction failed and will be retried in 0.9938007952222626s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,028 - WARNING - Transaction failed and will be retried in 0.8702105541490324s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,029 - WARNING - Transaction failed and will be retried in 0.8462669299501564s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,030 - WARNING - Transaction failed and will be retried in 1.0194076584677771s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,030 - WARNING - Transaction failed and will be retried in 1.0046423569102292s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,031 - WARNING - Transaction failed and will be retried in 0.9616577752702145s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,032 - WARNING - Transaction failed and will be retried in 0.8617972688858365s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,033 - WARNING - Transaction failed and will be retried in 0.8334619136714296s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,033 - INFO - AuraConnector: Connector's Driver Closed Successfully.
-2025-12-09 15:03:51,035 - ERROR - AuraConnector: 
-2025-12-09 15:03:51,035 - ERROR - Load process interrupted manually.
-2025-12-09 15:03:51,036 - WARNING - Transaction failed and will be retried in 0.8808566511694613s (Failed to read from defunct connection IPv4Address(('si-da17874c-7118.production-orch-0033.neo4j.io', 7687)) (ResolvedIPv4Address(('34.78.243.29', 7687))))
-2025-12-09 15:03:51,036 - WARNING - Loading stage interrupted manually.
+2025-12-09 20:13:04,947 - INFO - Logs file initialized.
+2025-12-09 20:13:28,516 - ERROR - AtlasConnector: connection failed: ac-isprda1-shard-00-01.bhwxf0o.mongodb.net:27017: [Errno -3] Temporary failure in name resolution (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-12-09 20:13:55,121 - INFO - AtlasConnector: deployment pinged. Successfully connected to MongoDB Atlas.
+2025-12-09 20:13:55,122 - INFO - AtlasConnector: Cluster: articles-cluster.
+2025-12-09 20:13:55,122 - INFO - AtlasConnector: DataBase: fetched-data-db.
+2025-12-09 20:13:55,122 - INFO - AtlasConnector: Collection: pm-pmc-data.
+2025-12-09 20:13:55,164 - INFO - AtlasConnector: fetching docs from MongoDB Atlas.
+2025-12-09 20:14:30,488 - INFO - AtlasConnector: articles fetched successfully from MongoDB Atlas.
+2025-12-09 20:14:30,527 - INFO - AtlasConnector: connection closed.

@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "D3 Display for Vector and Graph Friends",
-  description: "A visualization tool to see networks grow.",
+  title: "MedGraphETL",
+  description: "A visualization tool to inspect the graph",
 };
 
 export default function RootLayout({
