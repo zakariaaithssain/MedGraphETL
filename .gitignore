@@ -5,10 +5,14 @@
 .env
 *.env
 
+INTEGRATION_GUIDE.md
+
 __pycache__/
 .vscode/
 extracted_entities.csv
 extracted_relations.csv
+
+
 
 #frontend
 # dependencies
@@ -46,3 +50,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+node_modules/
+.next/
