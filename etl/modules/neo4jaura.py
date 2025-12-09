@@ -36,18 +36,19 @@ class Neo4jAuraConnector:
     def __init__(self, uri: str, auth: tuple, load_batch_size = 1000):
         """I am using Neo4j Aura Free, so I cannot create databases, 
             it uses the default one"""
-        self.driver = GraphDatabase.driver(uri, auth=auth, database='neo4j')
+        
+        self.driver = GraphDatabase.driver(uri, auth=auth)
         self.load_batch_size = load_batch_size
 
     #dunder methods for context management
     def __enter__(self):
         try: 
-            with self.driver.session() as session: 
-                result = session.run("RETURN 1 AS test")
-                logging.info("AuraConnector: Successfully Connected To Neo4j Aura.")
+            self.driver.verify_connectivity()
+            self.driver.verify_authentication()
+            logging.info("AuraConnector: Successfully Connected To Neo4j Aura.")
         except Exception as e: 
-                logging.critical(f"AuraConnector: Connection Failed: {e}")
-                raise
+            logging.critical(f"AuraConnector: Connection Failed: {e}")
+            raise
         return self
     
     def __exit__(self, exception_type, exception_value, traceback):
