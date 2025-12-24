@@ -1,6 +1,9 @@
 import os
 from dotenv import load_dotenv
+
+
 load_dotenv()
+
 
 PM_API_KEY_EMAIL = {
     "api_key": os.getenv("PM_API_KEY"),
