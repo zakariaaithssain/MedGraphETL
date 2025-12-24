@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -9,19 +9,30 @@ from dotenv import load_dotenv
 import uvicorn
 import os
 
+
 load_dotenv()
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage app lifespan - startup and shutdown"""
-    # Startup
-    yield
-    # Shutdown
-    if driver:
-        driver.close()
+    NEO4J_URI = os.getenv("NEO4J_URI")
+    NEO4J_USER = os.getenv("NEO4J_USERNAME")
+    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
+    if not all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]): 
+        raise RuntimeError("Neo4j environment variables are missing, make sure .env file exists in root")
+    
+    driver = None
+    try:
+        driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+        driver.verify_connectivity()
+        app.state.driver = driver
+        yield
+    finally: 
+        if driver: driver.close()
+    
 
-app = FastAPI(title="Neo4j API", version="1.0.0", lifespan=lifespan)
-
+app = FastAPI(title="MedGraphETL API", version="1.0.0", lifespan=lifespan)
 # Enable CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
@@ -31,24 +42,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Neo4j driver initialization
-NEO4J_URI = os.getenv("NEO4J_URI")
-NEO4J_USER = os.getenv("NEO4J_USERNAME")
-NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
-try:
-    driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
-    driver.verify_connectivity()
-except Exception as e:
-    print(f"Failed to connect to Neo4j: {e}")
-    driver = None
 
-# Request/Response models
 @app.get("/")
 async def root():
     """Root endpoint - API info"""
     return {
-        "message": "Neo4j API Server",
+        "message": "MedGraphETL API Server",
         "version": "1.0.0",
         "endpoints": {
             "health": "/health",

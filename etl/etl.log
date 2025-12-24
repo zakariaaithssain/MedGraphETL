@@ -1,9 +1,7 @@
-2025-12-09 20:13:04,947 - INFO - Logs file initialized.
-2025-12-09 20:13:28,516 - ERROR - AtlasConnector: connection failed: ac-isprda1-shard-00-01.bhwxf0o.mongodb.net:27017: [Errno -3] Temporary failure in name resolution (configured timeouts: connectTimeoutMS: 20000.0ms)
-2025-12-09 20:13:55,121 - INFO - AtlasConnector: deployment pinged. Successfully connected to MongoDB Atlas.
-2025-12-09 20:13:55,122 - INFO - AtlasConnector: Cluster: articles-cluster.
-2025-12-09 20:13:55,122 - INFO - AtlasConnector: DataBase: fetched-data-db.
-2025-12-09 20:13:55,122 - INFO - AtlasConnector: Collection: pm-pmc-data.
-2025-12-09 20:13:55,164 - INFO - AtlasConnector: fetching docs from MongoDB Atlas.
-2025-12-09 20:14:30,488 - INFO - AtlasConnector: articles fetched successfully from MongoDB Atlas.
-2025-12-09 20:14:30,527 - INFO - AtlasConnector: connection closed.
+2025-12-22 16:17:02,688 - INFO - Logs file initialized.
+2025-12-22 16:17:03,000 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-22 16:17:03,000 - INFO - PubMed API: email used.
+2025-12-22 16:17:03,012 - INFO - PubMed API: loaded 36132 UIDs from cache.
+2025-12-22 16:17:03,012 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-22 16:17:03,012 - INFO - PubMed API: email used.
+2025-12-22 16:17:03,012 - INFO - PubMed API: no cache found, starting fresh.
