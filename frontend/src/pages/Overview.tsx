@@ -111,7 +111,7 @@ const Overview = () => {
           <div>
             <p className="text-xs text-muted-foreground mb-1">Base URL</p>
             <code className="text-sm bg-muted px-2 py-1 rounded">
-              {import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}
+              {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}
             </code>
           </div>
           <div>
