@@ -161,11 +161,9 @@ const Relationships = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="w-[120px]">Type</TableHead>
-                <TableHead>Source Label</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Source</TableHead>
                 <TableHead className="w-[50px] text-center"></TableHead>
-                <TableHead>Target Label</TableHead>
                 <TableHead>Target</TableHead>
                 <TableHead className="hidden lg:table-cell">Properties</TableHead>
               </TableRow>
@@ -178,10 +176,7 @@ const Relationships = () => {
                   onClick={() => setExpandedRow(expandedRow === (rel.id || String(index)) ? null : (rel.id || String(index)))}
                 >
                   <TableCell>
-                    <LabelBadge label={rel.type} />
-                  </TableCell>
-                  <TableCell>
-                    <LabelBadge label={rel.sourceLabel} />
+                    <LabelBadge label={rel.type} variant="primary" />
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 text-sm">
@@ -191,9 +186,6 @@ const Relationships = () => {
                   </TableCell>
                   <TableCell className="text-center">
                     <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
-                  </TableCell>
-                  <TableCell>
-                    <LabelBadge label={rel.targetLabel} />
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1 text-sm">
