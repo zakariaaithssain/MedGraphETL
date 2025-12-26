@@ -93,7 +93,7 @@ const Overview = () => {
           {relationshipTypes.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {relationshipTypes.map((type) => (
-                <LabelBadge key={type} label={type} variant="outline" />
+                <LabelBadge key={type} label={type} />
               ))}
             </div>
           ) : (

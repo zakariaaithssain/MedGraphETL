@@ -168,6 +168,7 @@ const Nodes = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
+                <TableHead className="w-[100px]">Label</TableHead>
                 <TableHead className="w-[200px]">Node ID</TableHead>
                 <TableHead>CUI</TableHead>
                 <TableHead>Name</TableHead>
@@ -181,6 +182,9 @@ const Nodes = () => {
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => setExpandedRow(expandedRow === node.id ? null : node.id)}
                 >
+                  <TableCell>
+                    <LabelBadge label={effectiveLabel} />
+                  </TableCell>
                   <TableCell className="font-mono text-sm">
                     <div className="flex items-center gap-2">
                       <span className="truncate max-w-[150px]">{node.id}</span>
