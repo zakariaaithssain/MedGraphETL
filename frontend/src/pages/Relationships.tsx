@@ -26,20 +26,17 @@ import {
 import { cn } from '@/lib/utils';
 
 const Relationships = () => {
-  const { data: relations, isLoading, isError, refetch, isFetching } = useRelations();
+  const [selectedType, setSelectedType] = useState<string>('INTERACTS_WITH');
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
-  // Get unique relationship types
-  const allTypes = useMemo(() => {
-    if (!relations) return [];
-    const types = new Set<string>();
-    relations.forEach((rel) => rel.type && types.add(rel.type));
-    return Array.from(types).sort();
-  }, [relations]);
+  // Fetch relations for selected type
+  const { data: relations, isLoading, isError, refetch, isFetching } = useRelations({ 
+    type: selectedType, 
+    limit: 100 
+  });
 
-  // Filter relationships
+  // Filter relationships by search
   const filteredRelations = useMemo(() => {
     if (!relations) return [];
     return relations.filter((rel) => {
@@ -48,11 +45,9 @@ const Relationships = () => {
         rel.sourceId?.toLowerCase().includes(search.toLowerCase()) ||
         rel.targetId?.toLowerCase().includes(search.toLowerCase());
       
-      const matchesType = typeFilter === 'all' || rel.type === typeFilter;
-
-      return matchesSearch && matchesType;
+      return matchesSearch;
     });
-  }, [relations, search, typeFilter]);
+  }, [relations, search]);
 
   if (isLoading) {
     return <LoadingState message="Loading relationships..." />;
@@ -91,16 +86,16 @@ const Relationships = () => {
           placeholder="Search by type or node IDs..."
           className="flex-1 max-w-md"
         />
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
+        <Select value={selectedType} onValueChange={setSelectedType}>
           <SelectTrigger className="w-full sm:w-[200px]">
             <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter by type" />
+            <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            {allTypes.map((type) => (
-              <SelectItem key={type} value={type}>{type}</SelectItem>
-            ))}
+            <SelectItem value="INTERACTS_WITH">INTERACTS_WITH</SelectItem>
+            <SelectItem value="TREATS">TREATS</SelectItem>
+            <SelectItem value="CAUSES">CAUSES</SelectItem>
+            <SelectItem value="TARGETS">TARGETS</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -110,9 +105,9 @@ const Relationships = () => {
         <EmptyState
           icon={GitBranch}
           title="No relationships found"
-          description={search || typeFilter !== 'all' 
-            ? "Try adjusting your search or filter criteria" 
-            : "The graph doesn't contain any relationships yet"}
+          description={search 
+            ? "Try adjusting your search criteria" 
+            : "The graph doesn't contain any relationships for this type"}
         />
       ) : (
         <div className="rounded-lg border bg-card shadow-sm overflow-hidden">

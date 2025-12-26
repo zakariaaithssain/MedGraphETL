@@ -26,21 +26,18 @@ import {
 import { cn } from '@/lib/utils';
 
 const Nodes = () => {
-  const { data: nodes, isLoading, isError, refetch, isFetching } = useNodes();
-  const [search, setSearch] = useState('');
-  const [labelFilter, setLabelFilter] = useState<string>('all');
+  const [selectedLabel, setSelectedLabel] = useState<string>('DRUG');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
-  // Get unique labels
-  const allLabels = useMemo(() => {
-    if (!nodes) return [];
-    const labels = new Set<string>();
-    nodes.forEach((node) => node.labels?.forEach((l) => labels.add(l)));
-    return Array.from(labels).sort();
-  }, [nodes]);
+  // Fetch nodes for selected label
+  const { data: nodes, isLoading, isError, refetch, isFetching } = useNodes({ 
+    label: selectedLabel, 
+    limit: 100 
+  });
 
-  // Filter nodes
+  // Filter nodes by search
   const filteredNodes = useMemo(() => {
     if (!nodes) return [];
     return nodes.filter((node) => {
@@ -49,12 +46,9 @@ const Nodes = () => {
         node.labels?.some((l) => l.toLowerCase().includes(search.toLowerCase())) ||
         JSON.stringify(node.properties).toLowerCase().includes(search.toLowerCase());
       
-      const matchesLabel = labelFilter === 'all' || 
-        node.labels?.includes(labelFilter);
-
-      return matchesSearch && matchesLabel;
+      return matchesSearch;
     });
-  }, [nodes, search, labelFilter]);
+  }, [nodes, search]);
 
   const handleCopyId = async (id: string) => {
     await navigator.clipboard.writeText(id);
@@ -99,16 +93,16 @@ const Nodes = () => {
           placeholder="Search by ID, label, or property..."
           className="flex-1 max-w-md"
         />
-        <Select value={labelFilter} onValueChange={setLabelFilter}>
+        <Select value={selectedLabel} onValueChange={setSelectedLabel}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter by label" />
+            <SelectValue placeholder="Select label" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Labels</SelectItem>
-            {allLabels.map((label) => (
-              <SelectItem key={label} value={label}>{label}</SelectItem>
-            ))}
+            <SelectItem value="DRUG">DRUG</SelectItem>
+            <SelectItem value="DISEASE">DISEASE</SelectItem>
+            <SelectItem value="GENE">GENE</SelectItem>
+            <SelectItem value="PROTEIN">PROTEIN</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -118,9 +112,9 @@ const Nodes = () => {
         <EmptyState
           icon={Circle}
           title="No nodes found"
-          description={search || labelFilter !== 'all' 
-            ? "Try adjusting your search or filter criteria" 
-            : "The graph doesn't contain any nodes yet"}
+          description={search 
+            ? "Try adjusting your search criteria" 
+            : "The graph doesn't contain any nodes for this label"}
         />
       ) : (
         <div className="rounded-lg border bg-card shadow-sm overflow-hidden">

@@ -1,4 +1,4 @@
-import { useGraphInfo, useNodes, useRelations } from '@/hooks/useApi';
+import { useGraphInfo } from '@/hooks/useApi';
 import { StatCard } from '@/components/StatCard';
 import { LabelBadge } from '@/components/LabelBadge';
 import { LoadingState } from '@/components/LoadingState';
@@ -7,8 +7,6 @@ import { Circle, GitBranch, Tag, Database, Activity, Zap } from 'lucide-react';
 
 const Overview = () => {
   const { data: graphInfo, isLoading, isError, refetch } = useGraphInfo();
-  const { data: nodes } = useNodes();
-  const { data: relations } = useRelations();
 
   if (isLoading) {
     return <LoadingState message="Loading graph statistics..." />;
@@ -18,8 +16,8 @@ const Overview = () => {
     return <ErrorState onRetry={() => refetch()} />;
   }
 
-  const nodeCount = graphInfo?.nodeCount ?? nodes?.length ?? 0;
-  const relationCount = graphInfo?.relationCount ?? relations?.length ?? 0;
+  const nodeCount = graphInfo?.nodeCount ?? 0;
+  const relationCount = graphInfo?.relationCount ?? 0;
   const nodeLabels = graphInfo?.nodeLabels ?? [];
   const relationshipTypes = graphInfo?.relationshipTypes ?? [];
 

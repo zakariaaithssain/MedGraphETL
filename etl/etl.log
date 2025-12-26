@@ -1,7 +1,7 @@
-2025-12-22 16:17:02,688 - INFO - Logs file initialized.
-2025-12-22 16:17:03,000 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-22 16:17:03,000 - INFO - PubMed API: email used.
-2025-12-22 16:17:03,012 - INFO - PubMed API: loaded 36132 UIDs from cache.
-2025-12-22 16:17:03,012 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-22 16:17:03,012 - INFO - PubMed API: email used.
-2025-12-22 16:17:03,012 - INFO - PubMed API: no cache found, starting fresh.
+2025-12-26 16:02:27,180 - INFO - Logs file initialized.
+2025-12-26 16:02:28,109 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-26 16:02:28,110 - INFO - PubMed API: email used.
+2025-12-26 16:02:28,136 - INFO - PubMed API: loaded 36132 UIDs from cache.
+2025-12-26 16:02:28,136 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-26 16:02:28,136 - INFO - PubMed API: email used.
+2025-12-26 16:02:28,136 - INFO - PubMed API: no cache found, starting fresh.

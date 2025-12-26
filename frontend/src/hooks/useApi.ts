@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getHealth, getNodes, getRelations, getGraphInfo, getApiInfo } from '@/services/api';
+import { getHealth, getApiInfo, getNodes, getRelations, getGraphInfo } from '@/services/api';
 
 export const useHealth = (refetchInterval?: number) => {
   return useQuery({
@@ -18,18 +18,28 @@ export const useApiInfo = () => {
   });
 };
 
-export const useNodes = () => {
+export const useNodes = (params?: {
+  label?: string;
+  cui?: string;
+  name?: string;
+  limit?: number;
+}) => {
   return useQuery({
-    queryKey: ['nodes'],
-    queryFn: getNodes,
+    queryKey: ['nodes', params],
+    queryFn: () => getNodes(params),
     retry: 2,
   });
 };
 
-export const useRelations = () => {
+export const useRelations = (params?: {
+  type?: string;
+  source_cui?: string;
+  target_cui?: string;
+  limit?: number;
+}) => {
   return useQuery({
-    queryKey: ['relations'],
-    queryFn: getRelations,
+    queryKey: ['relations', params],
+    queryFn: () => getRelations(params),
     retry: 2,
   });
 };
