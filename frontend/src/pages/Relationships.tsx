@@ -1,6 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRelations, useGraphInfo } from '@/hooks/useApi';
-import { SearchInput } from '@/components/SearchInput';
 import { LabelBadge } from '@/components/LabelBadge';
 import { JsonViewer } from '@/components/JsonViewer';
 import { LoadingState } from '@/components/LoadingState';
@@ -28,7 +27,6 @@ import { cn } from '@/lib/utils';
 
 const Relationships = () => {
   const [selectedType, setSelectedType] = useState<string>('');
-  const [search, setSearch] = useState('');
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [sourceCui, setSourceCui] = useState('');
   const [targetCui, setTargetCui] = useState('');
@@ -51,19 +49,6 @@ const Relationships = () => {
     limit: limit 
   }, effectiveType ? true : false);
 
-  // Filter relationships by search
-  const filteredRelations = useMemo(() => {
-    if (!relations) return [];
-    return relations.filter((rel) => {
-      const matchesSearch = search === '' || 
-        rel.type?.toLowerCase().includes(search.toLowerCase()) ||
-        rel.sourceId?.toLowerCase().includes(search.toLowerCase()) ||
-        rel.targetId?.toLowerCase().includes(search.toLowerCase());
-      
-      return matchesSearch;
-    });
-  }, [relations, search]);
-
   if (infoLoading || isLoading) {
     return <LoadingState message="Loading relationships..." />;
   }
@@ -79,7 +64,7 @@ const Relationships = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Relationships</h1>
           <p className="text-muted-foreground mt-1">
-            Explore graph connections ({filteredRelations.length} of {relations?.length ?? 0})
+            Explore graph connections ({relations?.length ?? 0} results)
           </p>
         </div>
         <Button 
@@ -95,14 +80,8 @@ const Relationships = () => {
 
       {/* Filters and Input Fields */}
       <div className="space-y-4">
-        {/* Search and Type Filter */}
+        {/* Type Filter */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by type or node IDs..."
-            className="flex-1 max-w-md"
-          />
           <Select value={selectedType} onValueChange={setSelectedType}>
             <SelectTrigger className="w-full sm:w-[220px]">
               <Filter className="h-4 w-4 mr-2" />
@@ -171,13 +150,11 @@ const Relationships = () => {
       </div>
 
       {/* Results */}
-      {filteredRelations.length === 0 ? (
+      {!relations || relations.length === 0 ? (
         <EmptyState
           icon={GitBranch}
           title="No relationships found"
-          description={search 
-            ? "Try adjusting your search criteria" 
-            : "The graph doesn't contain any relationships for this type"}
+          description="The graph doesn't contain any relationships for this type"
         />
       ) : (
         <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
@@ -192,7 +169,7 @@ const Relationships = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRelations.map((rel, index) => (
+              {relations?.map((rel, index) => (
                 <TableRow 
                   key={rel.id || index}
                   className="cursor-pointer hover:bg-muted/50"
@@ -231,7 +208,7 @@ const Relationships = () => {
             <div className="border-t bg-muted/30 p-4 animate-slide-up">
               <h4 className="text-sm font-medium mb-2">Relationship Properties</h4>
               <JsonViewer 
-                data={filteredRelations.find((r) => (r.id || String(filteredRelations.indexOf(r))) === expandedRow)?.properties || {}}
+                data={relations?.find((r) => (r.id || String(relations.indexOf(r))) === expandedRow)?.properties || {}}
                 defaultExpanded
               />
             </div>

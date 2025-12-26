@@ -1,6 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNodes, useGraphInfo } from '@/hooks/useApi';
-import { SearchInput } from '@/components/SearchInput';
 import { LabelBadge } from '@/components/LabelBadge';
 import { JsonViewer } from '@/components/JsonViewer';
 import { LoadingState } from '@/components/LoadingState';
@@ -30,7 +29,6 @@ const Nodes = () => {
   const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
   const [cui, setCui] = useState('');
   const [name, setName] = useState('');
   const [limit, setLimit] = useState<number>(10);
@@ -51,19 +49,6 @@ const Nodes = () => {
     name: name || undefined,
     limit: limit 
   }, effectiveLabel ? true : false);
-
-  // Filter nodes by search
-  const filteredNodes = useMemo(() => {
-    if (!nodes) return [];
-    return nodes.filter((node) => {
-      const matchesSearch = search === '' || 
-        node.id?.toLowerCase().includes(search.toLowerCase()) ||
-        node.labels?.some((l) => l.toLowerCase().includes(search.toLowerCase())) ||
-        JSON.stringify(node.properties).toLowerCase().includes(search.toLowerCase());
-      
-      return matchesSearch;
-    });
-  }, [nodes, search]);
 
   const handleCopyId = async (id: string) => {
     await navigator.clipboard.writeText(id);
@@ -86,7 +71,7 @@ const Nodes = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Nodes</h1>
           <p className="text-muted-foreground mt-1">
-            Explore and search graph nodes ({filteredNodes.length} of {nodes?.length ?? 0})
+            Explore graph nodes ({nodes?.length ?? 0} results)
           </p>
         </div>
         <Button 
@@ -102,14 +87,8 @@ const Nodes = () => {
 
       {/* Filters and Input Fields */}
       <div className="space-y-4">
-        {/* Search and Label Filter */}
+        {/* Label Filter */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by ID, label, or property..."
-            className="flex-1 max-w-md"
-          />
           <Select value={selectedLabel} onValueChange={setSelectedLabel}>
             <SelectTrigger className="w-full sm:w-[200px]">
               <Filter className="h-4 w-4 mr-2" />
@@ -178,13 +157,11 @@ const Nodes = () => {
       </div>
 
       {/* Results */}
-      {filteredNodes.length === 0 ? (
+      {!nodes || nodes.length === 0 ? (
         <EmptyState
           icon={Circle}
           title="No nodes found"
-          description={search 
-            ? "Try adjusting your search criteria" 
-            : "The graph doesn't contain any nodes for this label"}
+          description="The graph doesn't contain any nodes for this label"
         />
       ) : (
         <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
@@ -198,7 +175,7 @@ const Nodes = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredNodes.map((node) => (
+              {nodes?.map((node) => (
                 <TableRow 
                   key={node.id}
                   className="cursor-pointer hover:bg-muted/50"
@@ -239,7 +216,7 @@ const Nodes = () => {
             <div className="border-t bg-muted/30 p-4 animate-slide-up">
               <h4 className="text-sm font-medium mb-2">Node Properties</h4>
               <JsonViewer 
-                data={filteredNodes.find((n) => n.id === expandedRow)?.properties || {}}
+                data={nodes?.find((n) => n.id === expandedRow)?.properties || {}}
                 defaultExpanded
               />
             </div>
