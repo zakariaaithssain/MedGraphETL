@@ -23,6 +23,10 @@ export interface ApiInfo {
 
 export interface GraphNode {
   id: string;
+  cui: string;
+  name: string;
+  normalizedName: string;
+  normalizationSource: string;
   labels: string[];
   properties: Record<string, unknown>;
 }
@@ -31,7 +35,11 @@ export interface GraphRelation {
   id?: string;
   type: string;
   sourceId: string;
+  sourceCui: string;
+  sourceName: string;
   targetId: string;
+  targetCui: string;
+  targetName: string;
   sourceLabel?: string;
   targetLabel?: string;
   properties: Record<string, unknown>;
@@ -46,16 +54,18 @@ export interface GraphInfo {
 
 // Raw API response types
 interface RawNode {
-  identity?: { low: number; high: number };
-  labels: string[];
-  properties: Record<string, unknown>;
+  cui: string;
+  name: string;
+  normalized_name: string;
+  id: string;
+  normalization_source: string;
+  [key: string]: unknown;
 }
 
 interface RawRelation {
   relationship: {
-    identity?: { low: number; high: number };
     type: string;
-    properties: Record<string, unknown>;
+    [key: string]: unknown;
   };
   source: RawNode;
   target: RawNode;
@@ -70,10 +80,7 @@ interface RawGraphInfo {
 
 // Helper function to extract node ID
 const getNodeId = (node: RawNode): string => {
-  if (node.identity && typeof node.identity.low === 'number') {
-    return `n${node.identity.low}`;
-  }
-  return JSON.stringify(node.identity || '');
+  return node.id || '';
 };
 
 // API Functions
@@ -95,13 +102,12 @@ export const getNodes = async (params?: {
 }): Promise<GraphNode[]> => {
   const queryParams: Record<string, unknown> = {};
   
-  // label is required, default to 'DRUG' if not provided
-  if (params?.label) {
-    queryParams.label = params.label;
-  } else {
-    queryParams.label = 'DRUG';
+  // label is required - must be provided
+  if (!params?.label) {
+    throw new Error('Label is required to fetch nodes');
   }
   
+  queryParams.label = params.label;
   if (params?.cui) queryParams.cui = params.cui;
   if (params?.name) queryParams.name = params.name;
   if (params?.limit) queryParams.limit = params.limit;
@@ -109,8 +115,17 @@ export const getNodes = async (params?: {
   const response = await api.get<RawNode[]>('/nodes', { params: queryParams });
   return response.data.map(node => ({
     id: getNodeId(node),
-    labels: node.labels || [],
-    properties: node.properties || {},
+    cui: node.cui,
+    name: node.name,
+    normalizedName: node.normalized_name,
+    normalizationSource: node.normalization_source,
+    labels: [], // Nodes don't have labels in this API
+    properties: {
+      cui: node.cui,
+      name: node.name,
+      normalized_name: node.normalized_name,
+      normalization_source: node.normalization_source,
+    },
   }));
 };
 
@@ -122,27 +137,40 @@ export const getRelations = async (params?: {
 }): Promise<GraphRelation[]> => {
   const queryParams: Record<string, unknown> = {};
   
-  // type is required, default to 'INTERACTS_WITH' if not provided
-  if (params?.type) {
-    queryParams.type = params.type;
-  } else {
-    queryParams.type = 'INTERACTS_WITH';
+  // type is required - must be provided
+  if (!params?.type) {
+    throw new Error('Type is required to fetch relations');
   }
   
+  queryParams.type = params.type;
   if (params?.source_cui) queryParams.source_cui = params.source_cui;
   if (params?.target_cui) queryParams.target_cui = params.target_cui;
   if (params?.limit) queryParams.limit = params.limit;
   
   const response = await api.get<RawRelation[]>('/relations', { params: queryParams });
-  return response.data.map((rel, index) => ({
-    id: rel.relationship.identity?.low ? `r${rel.relationship.identity.low}` : `r${index}`,
-    type: rel.relationship.type,
-    sourceId: getNodeId(rel.source),
-    targetId: getNodeId(rel.target),
-    sourceLabel: rel.source.labels?.[0],
-    targetLabel: rel.target.labels?.[0],
-    properties: rel.relationship.properties || {},
-  }));
+  return response.data.map((rel, index) => {
+    const relationshipProps: Record<string, unknown> = { type: rel.relationship.type };
+    // Include any additional properties from relationship
+    Object.keys(rel.relationship).forEach(key => {
+      if (key !== 'type') {
+        relationshipProps[key] = rel.relationship[key];
+      }
+    });
+
+    return {
+      id: `${rel.source.cui}-${rel.target.cui}-${index}`,
+      type: rel.relationship.type,
+      sourceId: getNodeId(rel.source),
+      sourceCui: rel.source.cui,
+      sourceName: rel.source.name,
+      targetId: getNodeId(rel.target),
+      targetCui: rel.target.cui,
+      targetName: rel.target.name,
+      sourceLabel: rel.source.normalized_name,
+      targetLabel: rel.target.normalized_name,
+      properties: relationshipProps,
+    };
+  });
 };
 
 export const getGraphInfo = async (): Promise<GraphInfo> => {

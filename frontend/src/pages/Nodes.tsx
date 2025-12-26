@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNodes } from '@/hooks/useApi';
+import { useNodes, useGraphInfo } from '@/hooks/useApi';
 import { SearchInput } from '@/components/SearchInput';
 import { LabelBadge } from '@/components/LabelBadge';
 import { JsonViewer } from '@/components/JsonViewer';
@@ -7,6 +7,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ErrorState } from '@/components/ErrorState';
 import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Copy, Check, Circle, Filter, RefreshCw } from 'lucide-react';
 import {
   Select,
@@ -26,16 +27,30 @@ import {
 import { cn } from '@/lib/utils';
 
 const Nodes = () => {
-  const [selectedLabel, setSelectedLabel] = useState<string>('DRUG');
+  const [selectedLabel, setSelectedLabel] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [cui, setCui] = useState('');
+  const [name, setName] = useState('');
+  const [limit, setLimit] = useState<number>(10);
 
-  // Fetch nodes for selected label
+  // Get available labels from graph info
+  const { data: graphInfo, isLoading: infoLoading } = useGraphInfo();
+  
+  // Set default label when graph info loads
+  const availableLabels = graphInfo?.nodeLabels || [];
+  const defaultLabel = availableLabels[0] || '';
+  
+  const effectiveLabel = selectedLabel || defaultLabel;
+
+  // Fetch nodes for selected label with filters
   const { data: nodes, isLoading, isError, refetch, isFetching } = useNodes({ 
-    label: selectedLabel, 
-    limit: 100 
-  });
+    label: effectiveLabel,
+    cui: cui || undefined,
+    name: name || undefined,
+    limit: limit 
+  }, effectiveLabel ? true : false);
 
   // Filter nodes by search
   const filteredNodes = useMemo(() => {
@@ -56,7 +71,7 @@ const Nodes = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (isLoading) {
+  if (infoLoading || isLoading) {
     return <LoadingState message="Loading nodes..." />;
   }
 
@@ -85,26 +100,81 @@ const Nodes = () => {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by ID, label, or property..."
-          className="flex-1 max-w-md"
-        />
-        <Select value={selectedLabel} onValueChange={setSelectedLabel}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Select label" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="DRUG">DRUG</SelectItem>
-            <SelectItem value="DISEASE">DISEASE</SelectItem>
-            <SelectItem value="GENE">GENE</SelectItem>
-            <SelectItem value="PROTEIN">PROTEIN</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filters and Input Fields */}
+      <div className="space-y-4">
+        {/* Search and Label Filter */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by ID, label, or property..."
+            className="flex-1 max-w-md"
+          />
+          <Select value={selectedLabel} onValueChange={setSelectedLabel}>
+            <SelectTrigger className="w-full sm:w-[200px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Select label" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableLabels.map((label) => (
+                <SelectItem key={label} value={label}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Additional Filters - CUI and Name */}
+        <div className="flex flex-col sm:flex-row gap-3 bg-muted/30 p-4 rounded-lg">
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              CUI (Concept Unique Identifier)
+            </label>
+            <Input
+              value={cui}
+              onChange={(e) => setCui(e.target.value)}
+              placeholder="Enter CUI..."
+              className="w-full"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              Name
+            </label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter name..."
+              className="w-full"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              Limit Results
+            </label>
+            <Input
+              type="number"
+              value={limit}
+              onChange={(e) => setLimit(Math.max(1, parseInt(e.target.value) || 1))}
+              placeholder="10"
+              min="1"
+              max="10000"
+              className="w-full"
+            />
+          </div>
+          <div className="flex items-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setCui('');
+                setName('');
+              }}
+              className="w-full sm:w-auto"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Results */}
@@ -122,8 +192,9 @@ const Nodes = () => {
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[200px]">Node ID</TableHead>
-                <TableHead>Labels</TableHead>
-                <TableHead className="hidden md:table-cell">Properties</TableHead>
+                <TableHead>CUI</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden md:table-cell">Normalized Name</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -153,17 +224,10 @@ const Nodes = () => {
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {node.labels?.map((label) => (
-                        <LabelBadge key={label} label={label} />
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <span className="text-sm text-muted-foreground">
-                      {Object.keys(node.properties || {}).length} properties
-                    </span>
+                  <TableCell className="font-mono text-sm">{node.cui}</TableCell>
+                  <TableCell className="max-w-[200px]">{node.name}</TableCell>
+                  <TableCell className="hidden md:table-cell max-w-[300px] text-sm text-muted-foreground">
+                    {node.normalizedName}
                   </TableCell>
                 </TableRow>
               ))}

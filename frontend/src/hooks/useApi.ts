@@ -23,11 +23,12 @@ export const useNodes = (params?: {
   cui?: string;
   name?: string;
   limit?: number;
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['nodes', params],
     queryFn: () => getNodes(params),
     retry: 2,
+    enabled,
   });
 };
 
@@ -36,11 +37,12 @@ export const useRelations = (params?: {
   source_cui?: string;
   target_cui?: string;
   limit?: number;
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['relations', params],
     queryFn: () => getRelations(params),
     retry: 2,
+    enabled,
   });
 };
 

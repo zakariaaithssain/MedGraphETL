@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useRelations } from '@/hooks/useApi';
+import { useRelations, useGraphInfo } from '@/hooks/useApi';
 import { SearchInput } from '@/components/SearchInput';
 import { LabelBadge } from '@/components/LabelBadge';
 import { JsonViewer } from '@/components/JsonViewer';
@@ -7,6 +7,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ErrorState } from '@/components/ErrorState';
 import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { GitBranch, Filter, RefreshCw, ArrowRight } from 'lucide-react';
 import {
   Select,
@@ -26,15 +27,29 @@ import {
 import { cn } from '@/lib/utils';
 
 const Relationships = () => {
-  const [selectedType, setSelectedType] = useState<string>('INTERACTS_WITH');
+  const [selectedType, setSelectedType] = useState<string>('');
   const [search, setSearch] = useState('');
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [sourceCui, setSourceCui] = useState('');
+  const [targetCui, setTargetCui] = useState('');
+  const [limit, setLimit] = useState<number>(10);
 
-  // Fetch relations for selected type
+  // Get available relationship types from graph info
+  const { data: graphInfo, isLoading: infoLoading } = useGraphInfo();
+  
+  // Set default type when graph info loads
+  const availableTypes = graphInfo?.relationshipTypes || [];
+  const defaultType = availableTypes[0] || '';
+  
+  const effectiveType = selectedType || defaultType;
+
+  // Fetch relations for selected type with filters
   const { data: relations, isLoading, isError, refetch, isFetching } = useRelations({ 
-    type: selectedType, 
-    limit: 100 
-  });
+    type: effectiveType,
+    source_cui: sourceCui || undefined,
+    target_cui: targetCui || undefined,
+    limit: limit 
+  }, effectiveType ? true : false);
 
   // Filter relationships by search
   const filteredRelations = useMemo(() => {
@@ -49,7 +64,7 @@ const Relationships = () => {
     });
   }, [relations, search]);
 
-  if (isLoading) {
+  if (infoLoading || isLoading) {
     return <LoadingState message="Loading relationships..." />;
   }
 
@@ -78,26 +93,81 @@ const Relationships = () => {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <SearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by type or node IDs..."
-          className="flex-1 max-w-md"
-        />
-        <Select value={selectedType} onValueChange={setSelectedType}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Select type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="INTERACTS_WITH">INTERACTS_WITH</SelectItem>
-            <SelectItem value="TREATS">TREATS</SelectItem>
-            <SelectItem value="CAUSES">CAUSES</SelectItem>
-            <SelectItem value="TARGETS">TARGETS</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filters and Input Fields */}
+      <div className="space-y-4">
+        {/* Search and Type Filter */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by type or node IDs..."
+            className="flex-1 max-w-md"
+          />
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-full sm:w-[220px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Select type" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableTypes.map((type) => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Additional Filters - Source and Target CUI */}
+        <div className="flex flex-col sm:flex-row gap-3 bg-muted/30 p-4 rounded-lg">
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              Source CUI (Concept Unique Identifier)
+            </label>
+            <Input
+              value={sourceCui}
+              onChange={(e) => setSourceCui(e.target.value)}
+              placeholder="Enter source CUI..."
+              className="w-full"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              Target CUI (Concept Unique Identifier)
+            </label>
+            <Input
+              value={targetCui}
+              onChange={(e) => setTargetCui(e.target.value)}
+              placeholder="Enter target CUI..."
+              className="w-full"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">
+              Limit Results
+            </label>
+            <Input
+              type="number"
+              value={limit}
+              onChange={(e) => setLimit(Math.max(1, parseInt(e.target.value) || 1))}
+              placeholder="10"
+              min="1"
+              max="10000"
+              className="w-full"
+            />
+          </div>
+          <div className="flex items-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSourceCui('');
+                setTargetCui('');
+              }}
+              className="w-full sm:w-auto"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Results */}
@@ -115,9 +185,9 @@ const Relationships = () => {
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead>Type</TableHead>
-                <TableHead>Source Node</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead className="w-[50px] text-center"></TableHead>
-                <TableHead>Target Node</TableHead>
+                <TableHead>Target</TableHead>
                 <TableHead className="hidden lg:table-cell">Properties</TableHead>
               </TableRow>
             </TableHeader>
@@ -132,26 +202,18 @@ const Relationships = () => {
                     <LabelBadge label={rel.type} variant="primary" />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      {rel.sourceLabel && (
-                        <LabelBadge label={rel.sourceLabel} className="hidden sm:inline-flex" />
-                      )}
-                      <code className="text-xs bg-muted px-1.5 py-0.5 rounded truncate max-w-[120px]">
-                        {rel.sourceId}
-                      </code>
+                    <div className="flex flex-col gap-1 text-sm">
+                      <div className="font-medium">{rel.sourceName}</div>
+                      <div className="font-mono text-xs text-muted-foreground">{rel.sourceCui}</div>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
                     <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      {rel.targetLabel && (
-                        <LabelBadge label={rel.targetLabel} className="hidden sm:inline-flex" />
-                      )}
-                      <code className="text-xs bg-muted px-1.5 py-0.5 rounded truncate max-w-[120px]">
-                        {rel.targetId}
-                      </code>
+                    <div className="flex flex-col gap-1 text-sm">
+                      <div className="font-medium">{rel.targetName}</div>
+                      <div className="font-mono text-xs text-muted-foreground">{rel.targetCui}</div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
