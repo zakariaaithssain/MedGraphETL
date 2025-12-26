@@ -3,7 +3,8 @@ import { StatCard } from '@/components/StatCard';
 import { LabelBadge } from '@/components/LabelBadge';
 import { LoadingState } from '@/components/LoadingState';
 import { ErrorState } from '@/components/ErrorState';
-import { Circle, GitBranch, Tag, Database, Activity, Zap } from 'lucide-react';
+import { Circle, GitBranch, Tag, Database, Activity, Zap, Info, BookOpen, Cpu, Settings } from 'lucide-react';
+import projectInfo from '@/data/projectInfo.json';
 
 const Overview = () => {
   const { data: graphInfo, isLoading, isError, refetch } = useGraphInfo();
@@ -104,21 +105,111 @@ const Overview = () => {
 
       {/* Quick Info */}
       <div className="rounded-lg border bg-card p-5 shadow-sm">
-        <h2 className="font-medium mb-3">API Information</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">Base URL</p>
-            <code className="text-sm bg-muted px-2 py-1 rounded">
-              {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}
-            </code>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="rounded-lg bg-blue/10 p-2">
+            <Info className="h-4 w-4 text-blue-600" />
           </div>
+          <h2 className="font-medium">Project Information</h2>
+        </div>
+        <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Database</p>
-            <p className="text-sm font-medium">Neo4j</p>
+            <h3 className="text-sm font-semibold text-foreground mb-1">{projectInfo.name}</h3>
+            <p className="text-sm text-muted-foreground">{projectInfo.description}</p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">Framework</p>
-            <p className="text-sm font-medium">FastAPI</p>
+
+          {/* Overview Section */}
+          <div className="pt-2 border-t">
+            <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+              <BookOpen className="h-3 w-3" /> {projectInfo.sections.overview.title}
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{projectInfo.sections.overview.content}</p>
+          </div>
+          
+          {/* Features & Data Sources */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                <BookOpen className="h-3 w-3" /> {projectInfo.sections.features.title}
+              </p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {projectInfo.sections.features.items.slice(0, 5).map((item, idx) => (
+                  <li key={idx} className="flex gap-2">
+                    <span className="text-primary">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+                <Database className="h-3 w-3" /> {projectInfo.sections.dataSources.title}
+              </p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {projectInfo.sections.dataSources.items.map((item, idx) => (
+                  <li key={idx} className="flex gap-2">
+                    <span className="text-primary">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Technology Stack */}
+          <div className="pt-2 border-t">
+            <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
+              <Cpu className="h-3 w-3" /> {projectInfo.sections.technology.title}
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3 text-xs">
+              <div>
+                <p className="text-muted-foreground font-medium mb-2">Backend</p>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>Framework: <span className="font-medium text-foreground">{projectInfo.sections.technology.backend.framework}</span></p>
+                  <p>Database: <span className="font-medium text-foreground">{projectInfo.sections.technology.backend.database}</span></p>
+                  <p>Language: <span className="font-medium text-foreground">{projectInfo.sections.technology.backend.language}</span></p>
+                  <p>NLP: <span className="font-medium text-foreground">{projectInfo.sections.technology.backend.nlpLibraries}</span></p>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground font-medium mb-2">Frontend</p>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>Framework: <span className="font-medium text-foreground">{projectInfo.sections.technology.frontend.framework}</span></p>
+                  <p>Build: <span className="font-medium text-foreground">{projectInfo.sections.technology.frontend.buildTool}</span></p>
+                  <p>Styling: <span className="font-medium text-foreground">{projectInfo.sections.technology.frontend.styling}</span></p>
+                  <p>Components: <span className="font-medium text-foreground">{projectInfo.sections.technology.frontend.components}</span></p>
+                </div>
+              </div>
+              <div>
+                <p className="text-muted-foreground font-medium mb-2">Storage</p>
+                <div className="space-y-1 text-muted-foreground">
+                  <p>Intermediate: <span className="font-medium text-foreground">{projectInfo.sections.technology.backend.intermediateStorage}</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ETL Pipeline */}
+          <div className="pt-2 border-t">
+            <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
+              <Settings className="h-3 w-3" /> ETL Pipeline
+            </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Stages: <span className="font-medium text-foreground">{projectInfo.sections.technology.etl.pipelineStages.join(' → ')}</span></p>
+              <p>CLI Options: <span className="font-medium text-foreground">{projectInfo.sections.technology.etl.configOptions.join(', ')}</span></p>
+            </div>
+          </div>
+
+          {/* System Requirements */}
+          <div className="pt-2 border-t">
+            <p className="text-xs font-medium text-muted-foreground mb-2">{projectInfo.sections.requirements.title}</p>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              {projectInfo.sections.requirements.items.map((item, idx) => (
+                <li key={idx} className="flex gap-2">
+                  <span className="text-primary">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

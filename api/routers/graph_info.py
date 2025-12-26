@@ -10,16 +10,16 @@ def get_graph_info(request: Request):
     driver = request.app.state.driver
 
     query = """
-    CALL {
+    CALL () {
         MATCH (n) RETURN count(n) AS node_count
     }
-    CALL {
+    CALL () {
         MATCH ()-[r]->() RETURN count(r) AS relation_count
     }
-    CALL {
+    CALL () {
         CALL db.labels() YIELD label RETURN collect(label) AS labels
     }
-    CALL {
+    CALL () {
         CALL db.relationshipTypes() YIELD relationshipType
         RETURN collect(relationshipType) AS relation_types
     }

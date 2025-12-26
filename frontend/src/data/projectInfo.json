@@ -1,0 +1,68 @@
+{
+  "name": "MedGraphETL",
+  "description": "An ETL pipeline that extracts medical literature from PubMed and PubMed Central, applies Named Entity Recognition (NER) and Relation Extraction (RE) to identify medical concepts, normalizes entities via UMLS API, and constructs a graph database in Neo4j for knowledge exploration and analysis.",
+  "version": "1.0.0",
+  "sections": {
+    "overview": {
+      "title": "Project Overview",
+      "content": "MedGraphETL is a comprehensive ETL (Extract, Transform, Load) pipeline designed to build medical knowledge graphs from authoritative medical literature. The system processes cancer-related articles from PubMed and PubMed Central, extracts medical entities and their relationships using NLP techniques, normalizes them through UMLS API, and stores the structured knowledge in a Neo4j graph database. The project includes both backend processing capabilities and a frontend interface for interactive exploration of the medical knowledge graph."
+    },
+    "features": {
+      "title": "Key Features",
+      "items": [
+        "Configurable ETL pipeline with CLI for extracting medical literature",
+        "Named Entity Recognition using ScispaCy (en_ner_bionlp13cg_md model)",
+        "Relation Extraction using Spacy Matchers and Dependency Matchers",
+        "Entity normalization via UMLS API for standardized medical concepts",
+        "MongoDB integration for intermediate article storage",
+        "Batch processing with configurable parameters (max-results, batch-size)",
+        "Full-text article extraction support from PubMed Central",
+        "Neo4j graph database storage with efficient loading strategies",
+        "Interactive web-based frontend for graph visualization and exploration",
+        "RESTful FastAPI backend for programmatic data access"
+      ]
+    },
+    "dataSources": {
+      "title": "Data Sources",
+      "items": [
+        "PubMed API - Medical literature abstracts and metadata",
+        "PubMed Central - Full-text medical articles",
+        "UMLS (Unified Medical Language System) - Medical concept normalization and standardized terminology"
+      ]
+    },
+    "technology": {
+      "title": "Technology Stack",
+      "backend": {
+        "framework": "FastAPI",
+        "database": "Neo4j Aura (for the graph) | MongoDB Atlas (for abstracts)",
+        "intermediateStorage": "MongoDB Atlas and CSV files",
+        "language": "Python",
+        "nlpLibraries": "ScispaCy, Spacy",
+        "nerModel": "en_ner_bionlp13cg_md"
+      },
+      "frontend": {
+        "framework": "React + TypeScript",
+        "buildTool": "Vite",
+        "styling": "Tailwind CSS",
+        "components": "shadcn/ui",
+        "stateManagement": "React Query"
+      },
+      "etl": {
+        "cliInterface": "Configurable command-line interface",
+        "pipelineStages": ["Extract", "Annotate", "Clean", "Load"],
+        "configOptions": ["--max-results", "--batch-size", "--full-text"]
+      }
+    },
+    "requirements": {
+      "title": "System Requirements",
+      "items": [
+        "Python (specific version in .python-version file, <3.13 due to thinc/spaCy dependencies)",
+        "PubMed API credentials (optional but recommended for higher rate limits)",
+        "UMLS API key (required for entity normalization)",
+        "MongoDB Atlas account and connection string",
+        "Neo4j Aura instance with credentials",
+        "Environment configuration file (.env) with API keys and connection strings"
+      ]
+    }
+  }
+}
