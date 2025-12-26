@@ -28,7 +28,7 @@ const Overview = () => {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Graph Overview</h1>
         <p className="text-muted-foreground mt-1">
-          Monitor your medical knowledge graph statistics and metadata
+          Explore MedGraphETL Metadata 
         </p>
       </div>
 
