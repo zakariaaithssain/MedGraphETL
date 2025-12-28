@@ -71,7 +71,7 @@ const Nodes = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Nodes</h1>
           <p className="text-muted-foreground mt-1">
-            Explore graph nodes ({nodes?.length ?? 0} results)
+            Explore graph nodes ({nodes?.length ?? 0} results) (Selected node properties are displayed in the bottom of the page)
           </p>
         </div>
         <Button 

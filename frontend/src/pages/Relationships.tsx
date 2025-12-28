@@ -64,7 +64,7 @@ const Relationships = () => {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Relationships</h1>
           <p className="text-muted-foreground mt-1">
-            Explore graph connections ({relations?.length ?? 0} results)
+            Explore graph relations ({relations?.length ?? 0} results) (Selected relation properties are displayed in the bottom of the page)
           </p>
         </div>
         <Button 
