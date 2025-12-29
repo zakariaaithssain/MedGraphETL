@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     NEO4J_USER = os.getenv("NEO4J_USERNAME")
     NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
     if not all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]): 
-        raise RuntimeError("Neo4j environment variables are missing, make sure .env file exists in root")
+        raise RuntimeError("Neo4j environment variables are missing.")
     
     driver = None
     try:
@@ -76,5 +76,10 @@ async def health_check(request: Request):
     
 
 
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+
+    host = os.getenv("API_HOST", "localhost")
+    port = int(os.getenv("API_PORT", "5000"))
+
+    uvicorn.run(app, host=host, port=port)
