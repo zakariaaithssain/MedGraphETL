@@ -4,9 +4,8 @@ WORKDIR /frontend
 COPY package*.json .
 RUN npm install
 COPY . .
+ENV VITE_API_BASE_URL=http://backend:8000
 RUN npm run build  
-RUN ls -la /frontend
-
 
 #serving (runtime)
 FROM nginx:alpine
