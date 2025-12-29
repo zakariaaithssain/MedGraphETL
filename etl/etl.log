@@ -1,7 +1,33 @@
-2025-12-26 16:02:27,180 - INFO - Logs file initialized.
-2025-12-26 16:02:28,109 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-26 16:02:28,110 - INFO - PubMed API: email used.
-2025-12-26 16:02:28,136 - INFO - PubMed API: loaded 36132 UIDs from cache.
-2025-12-26 16:02:28,136 - INFO - PubMed API: API key used, full API rate limit exploited.
-2025-12-26 16:02:28,136 - INFO - PubMed API: email used.
-2025-12-26 16:02:28,136 - INFO - PubMed API: no cache found, starting fresh.
+2025-12-29 12:41:17,915 - INFO - Logs file initialized.
+2025-12-29 12:41:18,857 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-29 12:41:18,859 - INFO - PubMed API: email used.
+2025-12-29 12:41:18,877 - INFO - PubMed API: loaded 36132 UIDs from cache.
+2025-12-29 12:41:18,877 - INFO - PubMed API: API key used, full API rate limit exploited.
+2025-12-29 12:41:18,877 - INFO - PubMed API: email used.
+2025-12-29 12:41:18,877 - INFO - PubMed API: no cache found, starting fresh.
+2025-12-29 12:41:23,744 - INFO - Starting extraction stage.
+2025-12-29 12:41:23,745 - INFO - Extraction Process: searching UIDs of articles found for each query.
+2025-12-29 12:41:23,745 - WARNING - PubMed API: For 'pubmed' database, ESearch Endpoint is built to only retrieve the first 10,000 records matching the query. To get more, either specify another database or use EDirect (a CLI). See PubMed API documentation for more info.
+2025-12-29 12:41:25,898 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:25,898 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:25,934 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:25,934 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:25,937 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:25,938 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:26,035 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:26,035 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:26,549 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:26,549 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:26,564 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:26,564 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:26,721 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:26,721 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:28,189 - INFO - PubMed API: search endpoint response OK: 200
+2025-12-29 12:41:28,189 - INFO - search endpoint sleeping for 0.11s.
+2025-12-29 12:41:28,305 - INFO - Extraction Process: only articles abstracts and metadata will be fetched.
+2025-12-29 12:41:28,310 - INFO - PubMed API: 4670 new UIDs articles to fetch.
+2025-12-29 12:41:32,048 - ERROR - Extraction process interrupted manually.
+2025-12-29 12:41:32,048 - WARNING - Extraction stage interrupted manually.
+2025-12-29 12:41:32,051 - ERROR - ETL pipeline stopped: Extraction stage failed or was interrupted.
+2025-12-29 12:41:54,121 - INFO - PubMed API: fetch endpoint response OK: 200
+2025-12-29 12:41:54,121 - INFO - fetch endpoint sleeping for 0.11s.
