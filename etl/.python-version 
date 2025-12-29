@@ -1,1 +1,3 @@
 3.12.12
+
+#for etl service, python version should be < 3.13 because of some problems caused by 'blis' (an internal depenedency of Scispacy)

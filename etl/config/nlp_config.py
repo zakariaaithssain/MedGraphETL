@@ -1,5 +1,11 @@
 #NER model used
-NER_MODEL = "en_ner_bionlp13cg_md"
+from dotenv import load_dotenv
+import os
+load_dotenv()
+NER_MODEL = os.getenv("NER_MODEL")
+
+
+
 # TOKEN-BASED MATCHER PATTERNS
 # -------------------------------
 MATCHER_PATTERNS = {
