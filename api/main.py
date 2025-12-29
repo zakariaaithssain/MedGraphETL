@@ -4,7 +4,6 @@ from neo4j import GraphDatabase
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
-import uvicorn
 import os
 
 from routers.nodes import nodes_router
@@ -75,11 +74,3 @@ async def health_check(request: Request):
         raise HTTPException(status_code=500, detail=f"Unhealthy: {str(e)}")
     
 
-
-
-if __name__ == "__main__":
-
-    host = os.getenv("API_HOST", "localhost")
-    port = int(os.getenv("API_PORT", "5000"))
-
-    uvicorn.run(app, host=host, port=port)

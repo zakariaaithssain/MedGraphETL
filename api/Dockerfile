@@ -1,0 +1,14 @@
+FROM python:3.12.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /api
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENTRYPOINT ["uvicorn", "main:app"]
+CMD ["--host", "0.0.0.0", "--port", "5000"]
