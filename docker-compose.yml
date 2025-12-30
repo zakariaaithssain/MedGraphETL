@@ -1,6 +1,6 @@
 
 services:
-  backend:
+  api:
     image: api:latest
     container_name: api
     ports:
@@ -17,7 +17,7 @@ services:
     networks:
       - medgraph-network
     depends_on:
-      - backend
+      - api
 
 networks:
   medgraph-network:

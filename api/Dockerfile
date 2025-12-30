@@ -6,7 +6,10 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /api
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+#install the uv python package manager
+RUN pip install uv
+# --system to avoid uv asking for a venv, we don't need it, imgs give enough isolation
+RUN uv pip install --no-cache-dir --system -r requirements.txt
 
 COPY . .
 
