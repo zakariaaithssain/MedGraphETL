@@ -34,8 +34,8 @@
       "title": "Technology Stack",
       "backend": {
         "framework": "FastAPI",
-        "database": "Neo4j Aura (for the graph) | MongoDB Atlas (for abstracts)",
-        "intermediateStorage": "MongoDB Atlas and CSV files",
+        "database": "Neo4j Neo4j (for the graph) | MongoDB  (for abstracts)",
+        "intermediateStorage": "MongoDB  and CSV files",
         "language": "Python",
         "nlpLibraries": "ScispaCy, Spacy",
         "nerModel": "en_ner_bionlp13cg_md"
@@ -59,8 +59,8 @@
         "Python (specific version in .python-version file, <3.13 due to thinc/spaCy dependencies)",
         "PubMed API credentials (optional but recommended for higher rate limits)",
         "UMLS API key (required for entity normalization)",
-        "MongoDB Atlas account and connection string",
-        "Neo4j Aura instance with credentials",
+        "MongoDB  account and connection string",
+        "Neo4j Neo4j instance with credentials",
         "Environment configuration file (.env) with API keys and connection strings"
       ]
     }

@@ -6,7 +6,7 @@ import time
 from scripts.extract import extract_pubmed_to_mongo
 from scripts.transform.annotate import annotate_mongo_articles
 from scripts.transform.clean import prepare_data_for_neo4j
-from scripts.load import load_to_aura
+from scripts.load import load_to_Neo4j
 
 from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
@@ -31,7 +31,12 @@ def extract_stage(article_content: bool = False,
                     max_results: int = None,
                     batch_size: int = 1000, bulk_size: int = 10000
     ):
-    """Step 1: Extract articles from PubMed to MongoDB."""
+    """get required articles data, either only abstracts or full content, from PubMed(Central) API, and load it to MongoDB  Cloud.
+      Arguments: 
+      article_content = if True, fetch articles full content if available on PubMedCentral. if False, fetch only abstracts from PubMed. 
+      max_results = the number of articles to search for PER QUERY, if max_results = None (default), get all the articles available. 
+      batch_size = Number of UIDs to POST per HTTP POST call to the API. 
+      bulk_size = Number of articles to load to Mongo per bulk write."""
     try:
         logging.info("Starting extraction stage.")
         print("Starting extraction stage...")
@@ -51,14 +56,14 @@ def extract_stage(article_content: bool = False,
 
 
 
-def annotate_stage(ents_path="data/extracted_entities.csv", rels_path="data/extracted_relations.csv"):
-    """Step 2: Annotate articles (NER, RE, Linking)."""
+def annotate_stage():
+    """Step 2: Apply NER and RE to articles stored in MongoDB"""
     try:
         logging.info("Starting annotation stage.")
         print("Starting annotation stage...")
-        annotate_mongo_articles(ents_path=ents_path, rels_path=rels_path)
-        logging.info(f"Annotation stage completed. Entities: {ents_path}, Relations: {rels_path}")
-        print("Annotation stage completed.")
+        annotate_mongo_articles()
+        logging.info(f"Annotation stage completed. Check data/ folder for created CSV files.")
+        print("Annotation stage completed. Check data/ folder.")
         return True
     except KeyboardInterrupt:
         print("Annotation stage interrupted manually.")
@@ -71,18 +76,12 @@ def annotate_stage(ents_path="data/extracted_entities.csv", rels_path="data/extr
 
 
 
-def clean_stage(raw_ents_path="data/extracted_entities.csv", 
-                raw_rels_path="data/extracted_relations.csv", 
-                saving_dir="data/ready_for_neo4j"):
-    """Step 3: Prepare data for Neo4j and return cleaned CSV paths."""
+def clean_stage():
+    """Step 3: Clean and prepare extracted data for Neo4j and return cleaned CSV paths."""
     try:
         logging.info("Starting cleaning stage.")
         print("Starting cleaning stage...")
-        ents_path, rels_path = prepare_data_for_neo4j(
-            raw_ents_path=raw_ents_path,
-            raw_rels_path=raw_rels_path,
-            saving_dir=saving_dir
-        )
+        ents_path, rels_path = prepare_data_for_neo4j()
         logging.info(f"Cleaning stage completed. Cleaned files: {ents_path}, {rels_path}")
         print("Cleaning stage completed.")
         return ents_path, rels_path
@@ -97,16 +96,18 @@ def clean_stage(raw_ents_path="data/extracted_entities.csv",
 
 
 
-def load_stage(ents_clean_csv='data/ready_for_neo4j/entities4neo4j.csv',
+def load_stage(only_related = True, 
+        ents_clean_csv='data/ready_for_neo4j/entities4neo4j.csv',
                rels_clean_csv='data/ready_for_neo4j/relations4neo4j.csv',
                labels=NEO4J_LABELS,
                reltypes=NEO4J_REL_TYPES,
                load_batch_size=1000):
-    """Step 4: Load entities and relations into Neo4j Aura."""
+    """Step 4: Load entities and relations into Neo4j Neo4j."""
     try:
         logging.info("Starting loading stage.")
         print("Starting loading stage...")
-        load_to_aura(
+        load_to_Neo4j(
+            only_related=only_related,
             labels_to_load=labels,
             ents_clean_csv=ents_clean_csv,
             reltypes_to_load=reltypes,
@@ -128,6 +129,7 @@ def load_stage(ents_clean_csv='data/ready_for_neo4j/entities4neo4j.csv',
 
 
 def run_etl(article_content: bool = False,
+    only_related: bool = True,
     max_results: int = None,
     batch_size: int = 1000,
     bulk_size: int= 10000,
@@ -158,7 +160,7 @@ def run_etl(article_content: bool = False,
             return False
         
         # Step 4: Load
-        if not load_stage(ents_clean_csv=ents_path, rels_clean_csv=rels_path, load_batch_size=load_batch_size):
+        if not load_stage(only_related=only_related, ents_clean_csv=ents_path, rels_clean_csv=rels_path, load_batch_size=load_batch_size):
             print("ETL pipeline stopped: Loading stage failed or was interrupted.")
             logging.error("ETL pipeline stopped: Loading stage failed or was interrupted.")
             return False
@@ -183,7 +185,7 @@ def run_etl(article_content: bool = False,
 def main():
     """Main entry point with CLI argument parsing."""
     parser = argparse.ArgumentParser(
-        description="Medical Graph ETL Pipeline",
+        description="MedGraphETL Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 No Flags Examples:
@@ -206,7 +208,7 @@ No Flags Examples:
         "--max-results",
         type=int,
         default=None,
-        help="Maximum number of results to fetch PER QUERY. default: None (extracts all available results), max: 10000 for PubMed, No limit for the other databases." \
+        help="Maximum results to search for PER QUERY. default: None (extracts all available results), max: 10000 for PubMed, No limit for the other databases." \
     )
     
     parser.add_argument(
@@ -233,6 +235,11 @@ No Flags Examples:
         action="store_true",
         help="Extract full articles contents instead of abstracts only"
     )
+    parser.add_argument(
+        "--include-singletons",
+        action="store_true",
+        help="Load all nodes to Neo4j, even those that are isolated (have no relationship) Default: only load related nodes."
+    )
     
     args = parser.parse_args()
     
@@ -254,9 +261,10 @@ No Flags Examples:
             if success:
                 print(f"Cleaned files ready: {ents_path}, {rels_path}")
         elif args.step == "load":
-            success = load_stage(load_batch_size=args.load_batch_size)
+            success = load_stage(load_batch_size=args.load_batch_size,
+                                 only_related=not args.include_singletons)
         else:
-            success = run_etl(
+            success = run_etl(only_related=not args.include_singletons, 
                 max_results=args.max_results,
                 article_content= args.article_content,
                 batch_size=args.batch_size,
@@ -270,7 +278,8 @@ No Flags Examples:
     except Exception as e:
         print(f"Unexpected error: {e}")
         logging.exception("Unexpected error occurred")
-    
+        
+    return success
    
 
 

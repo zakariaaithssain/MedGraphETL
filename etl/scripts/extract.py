@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from modules.pubmed_api import NewPubMedAPI
 from modules.pubmedcentral_api import NewPMCAPI
-from modules.mongoatlas import MongoAtlasConnector
+from modules.mongo import MongoConnector
 
 from config.settings import PM_API_KEY_EMAIL
 from config.apis_config import PM_QUERIES
@@ -25,7 +25,7 @@ def extract_pubmed_to_mongo(article_content: bool = False,
                                             max_results: int = None,
                                               batch_size : int = 1000, bulk_size: int = 10000):
     """get required articles data, either only abstracts or full content, from PubMed(Central) API,
-        and load it to MongoDB Atlas Cloud.
+        and load it to MongoDB  Cloud.
             Arguments: 
             article_content = if True, fetch articles full content if available on PubMedCentral. 
                             if False, fetch only abstracts from PubMed.
@@ -36,8 +36,8 @@ def extract_pubmed_to_mongo(article_content: bool = False,
             """
     try: 
         all_articles = _get_data_from_apis(article_content, max_results, batch_size)
-        with MongoAtlasConnector(MONGO_CONNECTION_STR) as connector: 
-            connector.load_articles_to_atlas(all_articles, bulk_size)
+        with MongoConnector(MONGO_CONNECTION_STR) as connector: 
+            connector.load_articles_to_(all_articles, bulk_size)
 
     except KeyboardInterrupt: 
         logging.error("Extraction process interrupted manually.")
@@ -125,7 +125,7 @@ def _get_data_from_apis(article_content = False,
 # pubmedcentral_api = PubMedCentralAPI(key = PM_API_KEY_EMAIL["api_key"],
 #                                         email = PM_API_KEY_EMAIL["email"])
 
-# mongo_connector = MongoAtlasConnector(connection_str=MONGO_CONNECTION_STR)
+# mongo_connector = MongoConnector(connection_str=MONGO_CONNECTION_STR)
 
 
 # #less max_results, less API pression, more loop iterations
@@ -136,7 +136,7 @@ def _get_data_from_apis(article_content = False,
 #                                         extract_abstracts_only,
 #                                             max_results) 
         
-#         mongo_connector.load_articles_to_atlas(all_articles, abstract_only = True)
+#         mongo_connector.load_articles_to_(all_articles, abstract_only = True)
 
 #     except KeyboardInterrupt: 
 #         logging.error("Extraction Process Interrupted Manually.")

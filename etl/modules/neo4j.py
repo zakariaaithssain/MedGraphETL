@@ -1,5 +1,3 @@
-#TODO: add logs, tqdms with desc argument, and use Google Docstring format for documentation 
-# or maybe let the documentation till I finish the whole project and document for once. 
 
 import pandas as pd
 
@@ -11,6 +9,7 @@ from collections import defaultdict
 from tqdm import tqdm
 import logging
 import os 
+from pathlib import Path
 
 from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
@@ -24,7 +23,7 @@ from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
           network efficient (UNWIND: a batch in one connection, LOAD CSV I think the 
           whole csv in one connection)
     cons: uses plain cypher so no formatting is possible for dynamic labels 
-    and relations types. this can be fixed via APOC, but it's not available for N4J Aura. 
+    and relations types. this can be fixed via APOC, but it's not available for N4J Neo4j. 
     3 - I want dynamic labels and relation types, and I want efficiency, 
     so I will load each entity or relation type separately using cypher's UNWIND 
     (especially that I already know the entities and rels recognized by the model!!!!). 
@@ -32,10 +31,9 @@ from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
 
 
 
-class Neo4jAuraConnector:
+class Neo4jConnector:
     def __init__(self, uri: str, auth: tuple, load_batch_size = 1000):
-        """I am using Neo4j Aura Free, so I cannot create databases, 
-            it uses the default one"""
+    
         
         self.driver = GraphDatabase.driver(uri, auth=auth)
         self.load_batch_size = load_batch_size
@@ -45,22 +43,22 @@ class Neo4jAuraConnector:
         try: 
             self.driver.verify_connectivity()
             self.driver.verify_authentication()
-            logging.info("AuraConnector: Successfully Connected To Neo4j Aura.")
+            logging.info("Neo4jConnector: Successfully Connected To Neo4j Neo4j.")
         except Exception as e: 
-            logging.critical(f"AuraConnector: Connection Failed: {e}")
+            logging.critical(f"Neo4jConnector: Connection Failed: {e}")
             raise
         return self
     
     def __exit__(self, exception_type, exception_value, traceback):
         if self.driver: 
             self.driver.close()
-            logging.info("AuraConnector: Connector's Driver Closed Successfully.")
+            logging.info("Neo4jConnector: Connector's Driver Closed Successfully.")
         if exception_type: 
-            logging.error(f"AuraConnector: {exception_value}")
+            logging.error(f"Neo4jConnector: {exception_value}")
         return False #don't supress errors
 
-    def load_ents_to_aura(self, labels_to_load : list[str], ents_clean_csv: str, only_related: bool, rels_clean_csv: str):
-        """Load entities from the cleaned ents csv to Neo4j Aura. 
+    def load_ents_to_Neo4j(self, labels_to_load : list[str], ents_clean_csv: str, only_related: bool, rels_clean_csv: str):
+        """Load entities from the cleaned ents csv to Neo4j Neo4j. 
         Parameters:
             labels_to_load = list of the entities recognized by the NER model
             that we want to load. (exp: 'GENE')
@@ -76,17 +74,17 @@ class Neo4jAuraConnector:
                         with session.begin_transaction() as transaction: 
                             nodes_with_label = self._get_nodes_with_label(label,ents_clean_csv, only_related, rels_clean_csv)
                             self._ents_batch_load(label, nodes_batch=nodes_with_label, transaction= transaction)
-                    logging.info(f"AuraConnector: loaded {label} nodes")
+                    logging.info(f"Neo4jConnector: loaded {label} nodes")
 
                 except Exception as e:
-                    logging.warning(f"AuraConnector: failed to load {label} nodes: {e}")
+                    logging.warning(f"Neo4jConnector: failed to load {label} nodes: {e}")
         #this max workers is recommended by ChatGPT for I/O bound tasks
         with ThreadPoolExecutor(min(100, os.cpu_count() * 4)) as executor: 
             futures = [executor.submit(_worker, label) for label in labels_to_load]
             for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): 
                 future.result()
             else: 
-                logging.info("AuraConnector: loaded nodes successfully.")
+                logging.info("Neo4jConnector: loaded nodes successfully.")
 
         
 
@@ -114,10 +112,10 @@ class Neo4jAuraConnector:
             transaction.run(query, {"nodes":nodes_batch})
             transaction.commit()
         except Neo4jError as ne:
-            logging.error(f"AuraConnector: Neo4j error: {ne}")
+            logging.error(f"Neo4jConnector: Neo4j error: {ne}")
             raise
         except Exception as e:
-            logging.error(f"AuraConnector: {e}")
+            logging.error(f"Neo4jConnector: {e}")
             raise
 
 
@@ -132,20 +130,21 @@ class Neo4jAuraConnector:
                 rels_clean_csv = path to the relations cleaned csv"""
         assert label in NEO4J_LABELS, f"label argument got {label}, not one of {NEO4J_LABELS}."
         try: 
-            nodes_df = pd.read_csv(ents_clean_csv,
+            nodes_df = pd.read_csv(Path(ents_clean_csv),
                               dtype = {6:str, 7:str, 8:str, 9:str}) #to fix a DtypeWarning 
             if only_related:
-                rels_df = pd.read_csv(rels_clean_csv)
+                logging.info("Loading Process: only nodes with at least one relation will be loaded.")
+                rels_df = pd.read_csv(Path(rels_clean_csv))
                 related_nodes = set(rels_df[':START_ID']) | set(rels_df[':END_ID'])
                 nodes_df = nodes_df[nodes_df[':ID'].isin(related_nodes)]
         except Exception as e:
-            logging.error(f"AuraConnector: {e}")
+            logging.error(f"Neo4jConnector: {e}")
             raise
         
         try:
             entities = nodes_df[nodes_df[":LABEL"] == label].copy()
         except KeyError as e:
-            logging.error(f"AuraConnector: {e}. Perhaps You Changed ':LABEL' To Something Else During Cleaning?" )
+            logging.error(f"Neo4jConnector: {e}. Perhaps You Changed ':LABEL' To Something Else During Cleaning?" )
             raise
 
         if not entities.empty: 
@@ -157,13 +156,13 @@ class Neo4jAuraConnector:
             entities_dict = entities.to_dict("records")  #convert to list of dicts
             return entities_dict
         else:
-            logging.warning(f"AuraConnector: No {label} Nodes In {ents_clean_csv}.")
+            logging.warning(f"Neo4jConnector: No {label} Nodes In {ents_clean_csv}.")
             return []
         
 
 
     
-    def load_rels_to_aura(self, reltypes_to_load: list[str], rels_clean_csv: str):
+    def load_rels_to_Neo4j(self, reltypes_to_load: list[str], rels_clean_csv: str):
         assert all(rt in NEO4J_REL_TYPES for rt in reltypes_to_load), \
             f"{reltypes_to_load} contains invalid relation type(s), valid: {NEO4J_REL_TYPES}"
 
@@ -177,9 +176,9 @@ class Neo4jAuraConnector:
             
             for bcount, future in enumerate(tqdm(as_completed(futures), desc="loading relations:", total= len(futures))):
                 future.result()
-                logging.info(f"AuraConnector: loaded relations batch {bcount}")
+                logging.info(f"Neo4jConnector: loaded relations batch {bcount}")
 
-            else: logging.info("AuraConnector: loaded relations successfully.")
+            else: logging.info("Neo4jConnector: loaded relations successfully.")
             
             
     def _relations_batch_load(self, batch: list[dict], reltypes_to_load: list[str]):
@@ -198,7 +197,7 @@ class Neo4jAuraConnector:
                 session.execute_write(self._uow_write_rels, reltype, relations)
         #errors related to deadlocks
         except TransientError as e: 
-            logging.error(f"AuraConnector: {e}")
+            logging.error(f"Neo4jConnector: {e}")
             raise
         
     def _uow_write_rels(self, tx: Transaction, reltype: str, relations: list[dict]):
@@ -244,9 +243,9 @@ class Neo4jAuraConnector:
     def _all_relations_list(self, rels_clean_csv: str) -> list[dict]:
         """returns a list of dict, each dict represents a relation from the relations CSV file."""
         try: 
-            nodes_df = pd.read_csv(rels_clean_csv)
+            nodes_df = pd.read_csv(Path(rels_clean_csv))
         except FileNotFoundError as e:
-            logging.error(f"AuraConnector: {e}")
+            logging.error(f"Neo4jConnector: {e}")
             raise
 
         if not nodes_df.empty: 

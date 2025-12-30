@@ -11,7 +11,7 @@ _“This product uses publicly available data from the U.S. National Library of 
 - **Extract**: Fetch articles from PubMed API 
 - **Annotate**: Named Entity Recognition (NER) and Relation Extraction (RE) 
 - **Clean**: Data preparation and validation for graph database
-- **Load**: Loading into Neo4j Aura with batch processing
+- **Load**: Loading into Neo4j Neo4j with batch processing
 
 ### CLI
 - **Configurable Parameters**:
@@ -28,7 +28,7 @@ _“This product uses publicly available data from the U.S. National Library of 
 # Run full pipeline with defaults
 python main.py
 
-# Extract articles with full text, 5000 articles per API call, and load to Neo4j Aura with 5000 article per batch
+# Extract articles with full text, 5000 articles per API call, and load to Neo4j Neo4j with 5000 article per batch
 python main.py --max-results 5000 --full-text  --batch-size 5000
 
 # Run individual stages
@@ -50,13 +50,13 @@ python main.py --max-results 1000 --batch-size 200
 1. **Extract**: Connects to PubMed API and retrieves medical literature
 2. **Annotate**: Processes text for medical entities and relationships , and normalize entities via UMLS API. (generates two CSV files)
 4. **Clean**: Validates and prepares data for graph database storage (generates two cleaned CSV files)
-5. **Load**: Efficiently loads structured data into Neo4j Aura
+5. **Load**: Efficiently loads structured data into Neo4j Neo4j
 
 ### Data Processing
 - **MongoDB Integration**: Intermediate storage for extracted articles
 - **Entity Recognition**: Identifies medical entities (diseases, treatments, etc.)
 - **Relationship Extraction**: Discovers connections between medical concepts
-- **Graph Database**: Final storage in Neo4j Aura for complex queries and analysis
+- **Graph Database**: Final storage in Neo4j Neo4j for complex queries and analysis
 
 ##  System Requirements
 
@@ -64,8 +64,8 @@ python main.py --max-results 1000 --batch-size 200
 - This project uses 'spaCy' that depends on 'thinc' which uses deprecated Python C API functions that were removed in Python3.13 versions. So use the Python version that is specified in .python-version file.
 - PubMed API account email and API key (optional but increases the number of tolerated API calls, and needs sleep time configuration): https://account.ncbi.nlm.nih.gov
 - UMLS API API key (obligatory):  https://uts.nlm.nih.gov/
-- MongoDB Atlas Account:  https://www.mongodb.com/cloud/atlas/register
-- Neo4j Aura access (where the graph will be stored): https://console-preview.neo4j.io/account/profile
+- MongoDB  Account:  https://www.mongodb.com/cloud//register
+- Neo4j Neo4j access (where the graph will be stored): https://console-preview.neo4j.io/account/profile
 - Required Python packages (see requirements.txt)
 - Inside the etl/ folder, create `.env` file:
 
@@ -75,9 +75,9 @@ PM_EMAIL=<your_pubmed_email>
 
 UMLS_API_KEY=<your_umls_api_key>
 
-MONGO_CONNECTION_STR=<your_mongodb_atlas_connection_string>
+MONGO_CONNECTION_STR=<your_mongodb__connection_string>
 
-NEO4J_URI=<your_neo4j_aura_instance_uri>
+NEO4J_URI=<your_neo4j_Neo4j_instance_uri>
 NEO4J_USER=<your_neo4j_user>
 NEO4J_PASSWORD=<your_neo4j_instance_password>
 ```
@@ -89,7 +89,7 @@ NEO4J_PASSWORD=<your_neo4j_instance_password>
 1. Clone the repository
 2. Install dependencies: `pip install -r requirements.txt`
 3. Get your PubMed API key (optional but recommended) and UMLS API key
-4. Configure your MongoDB Atlas, Neo4j Aura
+4. Configure your MongoDB , Neo4j Neo4j
 5. Inside config/ create secrets.py described above
 
 
