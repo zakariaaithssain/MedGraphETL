@@ -44,6 +44,7 @@ See `etl/README.md` for instructions on running the ETL service.
 
 ```bash
 docker compose up --build 
+```
 
 
 ## Detailed Main Files Structure 
