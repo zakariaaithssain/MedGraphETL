@@ -16,6 +16,8 @@ services:
       - "8080:80"
     networks:
       - medgraph-network
+    depends_on:
+      - backend
 
 networks:
   medgraph-network:
