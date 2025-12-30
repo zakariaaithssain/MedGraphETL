@@ -43,7 +43,7 @@ See `etl/README.md` for instructions on running the ETL service.
 - Make sure Docker and Docker Compose are installed, then run:
 
 ```bash
-docker compose up --build ```
+docker compose up --build 
 
 
 ## Detailed Main Files Structure 
