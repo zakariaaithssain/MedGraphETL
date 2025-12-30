@@ -6,7 +6,7 @@ _“This product uses publicly available data from the U.S. National Library of 
 **Note: This pipeline uses en_ner_bionlp13cg_md Scispacy NER model for NER and Spacy Matchers and Dependency Matchers for RE. Data is not being revised or validated by any professionals from the medical field.** 
 
 ## Main Files Structure 
-`
+
 .
 ├── api  
 │   ├── Dockerfile  
@@ -56,5 +56,5 @@ _“This product uses publicly available data from the U.S. National Library of 
 ├── .gitignore  
 ├── LICENSE  
 └── README.md  
-`
+
 
