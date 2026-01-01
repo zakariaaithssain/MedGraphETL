@@ -12,7 +12,7 @@ from config.settings import MONGO_CONNECTION_STR
 
 global_annotator = None
 def get_annotator():
-    "we need this as we are using ProcessPoolExecutor, this loads the model once to memory"
+    "Creates a Singloton annotator"
     global global_annotator
     if global_annotator == None: 
         global_annotator = StreamingOptimizedNLP(

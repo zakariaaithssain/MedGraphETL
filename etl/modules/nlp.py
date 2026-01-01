@@ -6,7 +6,7 @@ import hashlib
 import warnings
 import os
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor,ProcessPoolExecutor,  as_completed
+from concurrent.futures import ThreadPoolExecutor,  as_completed
 from spacy.matcher import Matcher, DependencyMatcher
 
 from modules.umls_api import UMLSNormalizer

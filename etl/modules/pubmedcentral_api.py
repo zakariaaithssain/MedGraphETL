@@ -1,6 +1,5 @@
 from xml.etree import ElementTree as ET
 from typing import override
-from itertools import islice
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import logging
