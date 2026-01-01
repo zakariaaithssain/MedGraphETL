@@ -10,7 +10,7 @@ from config.settings import PM_API_KEY_EMAIL
 
 
 
-#search_uids I guess will be the same, but the fetch_new_articles and xml_parser functions should be overriden 
+#search_uids will be the same, but the fetch_new_articles and xml_parser functions should be overriden 
 class NewPMCAPI(NewPubMedAPI):
     def __init__(self, api_key = None, email = None):
         super().__init__(database = 'pmc', api_key = api_key, email = email)

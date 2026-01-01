@@ -23,7 +23,7 @@ from config.neo4jdb_config import NEO4J_LABELS, NEO4J_REL_TYPES
           network efficient (UNWIND: a batch in one connection, LOAD CSV I think the 
           whole csv in one connection)
     cons: uses plain cypher so no formatting is possible for dynamic labels 
-    and relations types. this can be fixed via APOC, but it's not available for N4J Neo4j. 
+    and relations types. this can be fixed via APOC, but it's not available for our case. 
     3 - I want dynamic labels and relation types, and I want efficiency, 
     so I will load each entity or relation type separately using cypher's UNWIND 
     (especially that I already know the entities and rels recognized by the model!!!!). 
@@ -78,7 +78,7 @@ class Neo4jConnector:
 
                 except Exception as e:
                     logging.warning(f"Neo4jConnector: failed to load {label} nodes: {e}")
-        #this max workers is recommended by ChatGPT for I/O bound tasks
+
         with ThreadPoolExecutor(min(100, os.cpu_count() * 4)) as executor: 
             futures = [executor.submit(_worker, label) for label in labels_to_load]
             for future in tqdm(as_completed(futures), desc="loading nodes:", total = len(labels_to_load)): 
@@ -169,7 +169,6 @@ class Neo4jConnector:
         all_relations = self._all_relations_list(rels_clean_csv)
         connexe_batches = self._create_connected_batches(all_relations)
         
-        #this max workers is recommended by ChatGPT for I/O bound tasks
         with ThreadPoolExecutor(min(100, os.cpu_count() * 4)) as executor:
             futures = [executor.submit(self._relations_batch_load, batch, reltypes_to_load) 
                        for batch in connexe_batches]
@@ -261,13 +260,12 @@ class Neo4jConnector:
 
     def _create_connected_batches(self, relations_list: list[dict]):
         """
-        Yields batches where each batch contains relations belonging 
+        Yields batches such that each batch contains relations belonging 
         to the same connected component. Optimal O(N + R).
         """
 
-        # --------------------------
+
         # Step 1: Build adjacency list
-        # --------------------------
         adj = defaultdict(set)
         nodes = set()
 
@@ -283,9 +281,7 @@ class Neo4jConnector:
             nodes.add(src)
             nodes.add(dest)
 
-        # --------------------------
         # Step 2: DFS to label components
-        # --------------------------
         component_of = {}        # node_id → component_id
         comp_id = 0
 
@@ -302,9 +298,7 @@ class Neo4jConnector:
 
                 comp_id += 1
 
-        # --------------------------
         # Step 3: Assign relations to batches in one pass
-        # --------------------------
         batches = defaultdict(list)  # comp_id → list of relations
 
         for rel in relations_list:
@@ -319,9 +313,7 @@ class Neo4jConnector:
 
             batches[cid].append(rel)
 
-        # --------------------------
         # Step 4: Yield the batches
-        # --------------------------
         for batch in batches.values():
             yield batch
 
