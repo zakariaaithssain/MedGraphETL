@@ -5,6 +5,8 @@
 .env
 *.env
 
+#cache 
+cache/
 
 __pycache__/
 .vscode/
