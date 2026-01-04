@@ -1,25 +1,24 @@
 {
   "name": "MedGraphETL",
-  "description": "An ETL pipeline that extracts medical literature from PubMed and PubMed Central, applies Named Entity Recognition (NER) and Relation Extraction (RE) to identify medical concepts, normalizes entities via UMLS API, and constructs a graph database in Neo4j for knowledge exploration and analysis.",
+  "description": "End-to-End ETL Pipeline to Build a Biomedical Knowledge Graph From Biomedical Articles.",
   "version": "1.0.0",
   "sections": {
     "overview": {
       "title": "Project Overview",
-      "content": "MedGraphETL is a comprehensive ETL (Extract, Transform, Load) pipeline designed to build medical knowledge graphs from authoritative medical literature. The system processes cancer-related articles from PubMed and PubMed Central, extracts medical entities and their relationships using NLP techniques, normalizes them through UMLS API, and stores the structured knowledge in a Neo4j graph database. The project includes both backend processing capabilities and a frontend interface for interactive exploration of the medical knowledge graph."
+      "content": "MedGraphETL is an end-to-end ETL pipeline that builds a biomedical knowledge graph from biomedical articles. The extracted data is transformed into a graph structure and loaded into a Neo4j instance, where it can be explored and queried. The frontend only provides a high-level exploration of the graph.\nNote:\nThis project uses SciSpacy for Named Entity Recognition (NER) and spaCy matchers for Relation Extraction (RE).\nThe extracted data is not reviewed or validated by medical professionals."
     },
     "features": {
       "title": "Key Features",
       "items": [
-        "Configurable ETL pipeline with CLI for extracting medical literature",
+        "Configurable ETL pipeline with a CLI",
         "Named Entity Recognition using ScispaCy (en_ner_bionlp13cg_md model)",
         "Relation Extraction using Spacy Matchers and Dependency Matchers",
-        "Entity normalization via UMLS API for standardized medical concepts",
+        "Entity Normalization via UMLS API for standardized medical concepts",
         "MongoDB integration for intermediate article storage",
-        "Batch processing with configurable parameters (max-results, batch-size)",
         "Full-text article extraction support from PubMed Central",
-        "Neo4j graph database storage with efficient loading strategies",
-        "Interactive web-based frontend for graph visualization and exploration",
-        "RESTful FastAPI backend for programmatic data access"
+        "Neo4j graph database storage and exploration",
+        "RESTful FastAPI backend for programmatic data access",
+        "Interactive web-based frontend for graph overview"
       ]
     },
     "dataSources": {
@@ -34,8 +33,8 @@
       "title": "Technology Stack",
       "backend": {
         "framework": "FastAPI",
-        "database": "Neo4j Neo4j (for the graph) | MongoDB  (for abstracts)",
-        "intermediateStorage": "MongoDB  and CSV files",
+        "database": "Neo4j, MongoDB",
+        "intermediateStorage": "MongoDB, CSV files",
         "language": "Python",
         "nlpLibraries": "ScispaCy, Spacy",
         "nerModel": "en_ner_bionlp13cg_md"
@@ -50,7 +49,7 @@
       "etl": {
         "cliInterface": "Configurable command-line interface",
         "pipelineStages": ["Extract", "Annotate", "Clean", "Load"],
-        "configOptions": ["--max-results", "--batch-size", "--full-text"]
+        "configOptions": ["--max-results", "--batch-size", "--bulk-size", "--article-content", "--load-batch-size", "--include-singletons"]
       }
     },
     "requirements": {
@@ -59,10 +58,9 @@
         "Python (specific version in .python-version file, <3.13 due to thinc/spaCy dependencies)",
         "PubMed API credentials (optional but recommended for higher rate limits)",
         "UMLS API key (required for entity normalization)",
-        "MongoDB  account and connection string",
-        "Neo4j Neo4j instance with credentials",
-        "Environment configuration file (.env) with API keys and connection strings"
-      ]
+        "MongoDB credentials",
+        "Neo4j credentials"    
+        ]
     }
   }
 }
