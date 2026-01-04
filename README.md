@@ -7,6 +7,7 @@ _“This product uses publicly available data from the U.S. National Library of 
 
 MedGraphETL is an end-to-end ETL pipeline that builds a biomedical knowledge graph from biomedical articles. The extracted data is transformed into a graph structure and loaded into a Neo4j instance, where it can be explored and queried. The frontend only provides a high-level exploration of the graph.
 
+
 **Note:**  
 This project uses **SciSpacy** for Named Entity Recognition (NER) and **spaCy matchers** for Relation Extraction (RE).  
 The extracted data is **not reviewed or validated by medical professionals**.
@@ -19,7 +20,6 @@ The system is composed of three containerized services:
 - **ETL Service**: Extracts biomedical articles data from APIs and stores it in MongoDB, Transforms data via Natural Language Processing (NLP), and finally Preprocesses and Loads structured data into Neo4j.
 - **API Service**: Exposes graph data through a REST API backed by Neo4j.
 - **Frontend Service**: Provides a lightweight UI for high-level exploration of the graph.
-
 
 **NOTE:** More technical details about each service are available in the `README` files inside each service's folder.
 
@@ -109,3 +109,10 @@ docker compose up --build
 ├── LICENSE
 └── README.md 
 ```
+<p align="center">
+<img src="imgs/medgraph.png" width="700"/>
+<img src="imgs/front.png" width="700"/>
+<img src="imgs/nodes.png" width="700"/>
+<img src="imgs/relations.png" width="700"/>
+</p>
+
