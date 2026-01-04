@@ -1,10 +1,13 @@
 #building
 FROM node:20-alpine AS builder
 WORKDIR /frontend
+# Accept build-time argument
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 COPY package*.json .
 RUN npm install
 COPY . .
-ENV VITE_API_BASE_URL=http://backend:8000
 RUN npm run build  
 
 #serving (runtime)
