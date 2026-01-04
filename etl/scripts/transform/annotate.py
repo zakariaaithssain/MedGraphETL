@@ -1,8 +1,8 @@
 import logging
 
 from tqdm import tqdm
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from modules.mongoatlas import MongoAtlasConnector
+from concurrent.futures import ProcessPoolExecutor
+from modules.mongo import MongoConnector
 from modules.umls_api import UMLSNormalizer
 from modules.nlp import StreamingOptimizedNLP
 
@@ -12,7 +12,7 @@ from config.settings import MONGO_CONNECTION_STR
 
 global_annotator = None
 def get_annotator():
-    "this actually loads the annotator once to the memory, but creates a unique one for each worker (I guess)"
+    "Creates a Singloton annotator"
     global global_annotator
     if global_annotator == None: 
         global_annotator = StreamingOptimizedNLP(
@@ -32,11 +32,11 @@ def combiner( text, article):
                     .extract_relations(text, article_metadata= article))  
                 
 
-def annotate_mongo_articles(ents_path ="data/extracted_entities.csv", rels_path = "data/extracted_relations.csv"):
+def annotate_mongo_articles():
     
-    connector = MongoAtlasConnector(connection_str=MONGO_CONNECTION_STR)
+    connector = MongoConnector(connection_str=MONGO_CONNECTION_STR)
     #list[dict] each dict is an article
-    articles = connector.fetch_articles_from_atlas(query={})
+    articles = connector.fetch_articles_from_(query={})
         
     #one for all so entities and relations could be saved in the class attr.
     #normalizer = UMLSNormalizer()

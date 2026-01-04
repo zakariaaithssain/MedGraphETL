@@ -3,16 +3,20 @@ import pandas as pd
 import uuid
 import logging
 import os
-#TODO: consider removing duplicated entities even if they are from different articles. 
-#TODO: consider removing the pmid, pmcid and fetching date from entities before cleaning them
-# because of them we will have redudent entities bla fayda. (keep pmid and pmcid for relations)
-def prepare_data_for_neo4j(raw_ents_path, raw_rels_path, saving_dir):
+from pathlib import Path
+
+def prepare_data_for_neo4j(raw_ents_path="data/extracted_entities.csv", 
+                raw_rels_path="data/extracted_relations.csv", 
+                saving_dir="data/ready_for_neo4j"):
 	"""Parameters: 
 	raw_ents_path = path to the raw extracted entities csv
 	raw_rels_path = path to raw extracted relations csv
 	saving_dir = path of the directory to which cleaned data will be saved"""
-	entities = pd.read_csv(raw_ents_path)
-	relations = pd.read_csv(raw_rels_path)
+	try:
+		entities = pd.read_csv(Path(raw_ents_path))
+		relations = pd.read_csv(Path(raw_rels_path))
+	except FileNotFoundError: 
+		raise FileNotFoundError("Raw entities or relations not found, did you run the previous stages?")
 
 	if 'Unnamed: 0' in entities.columns: entities.drop(columns=['Unnamed: 0'], inplace=True)
 	if 'Unnamed: 0' in relations.columns: relations.drop(columns=['Unnamed: 0'], inplace=True)
@@ -86,12 +90,12 @@ def prepare_data_for_neo4j(raw_ents_path, raw_rels_path, saving_dir):
 
 	#export again:
 	try: 
-		os.makedirs(name=saving_dir, exist_ok=True)
-		ents_path = f"{saving_dir}/entities4neo4j.csv"
-		rels_path = f"{saving_dir}/relations4neo4j.csv"
-		entities.to_csv(ents_path, index=False)
-		relations.to_csv(rels_path, index = False)
-		logging.info(f"Cleaning & Preparation Process Completed. Repo: {saving_dir}.")
+		os.makedirs(name=Path(saving_dir), exist_ok=True)
+		ents_path = f"{Path(saving_dir)}/entities4neo4j.csv"
+		rels_path = f"{Path(saving_dir)}/relations4neo4j.csv"
+		entities.to_csv(Path(ents_path), index=False)
+		relations.to_csv(Path(rels_path), index = False)
+		logging.info(f"Cleaning & Preparation Process Completed. Repo: {Path(saving_dir)}.")
 	except Exception as e: 
 		logging.error(f"Cleaning & Preparation Process Failed: {e}")
 

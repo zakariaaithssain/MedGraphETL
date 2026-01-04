@@ -1,27 +1,23 @@
 #etl
 #I named the venv .graph/
-.graph/
+.venv/
 #secrets
 .env
 *.env
 
-INTEGRATION_GUIDE.md
+#cache 
+cache/
 
 __pycache__/
 .vscode/
 extracted_entities.csv
 extracted_relations.csv
-README_COMPLETE.md
-
 
 #frontend
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
-
-# testing
-/coverage
 
 # next.js
 /.next/
@@ -54,8 +50,6 @@ node_modules/
 .next/
 
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -4,7 +4,6 @@ from neo4j import GraphDatabase
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
-import uvicorn
 import os
 
 from routers.nodes import nodes_router
@@ -21,7 +20,7 @@ async def lifespan(app: FastAPI):
     NEO4J_USER = os.getenv("NEO4J_USERNAME")
     NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
     if not all([NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD]): 
-        raise RuntimeError("Neo4j environment variables are missing, make sure .env file exists in root")
+        raise RuntimeError("Neo4j environment variables are missing.")
     
     driver = None
     try:
@@ -75,6 +74,3 @@ async def health_check(request: Request):
         raise HTTPException(status_code=500, detail=f"Unhealthy: {str(e)}")
     
 
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)

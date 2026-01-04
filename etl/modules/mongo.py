@@ -1,0 +1,202 @@
+from pymongo import MongoClient
+from pymongo import errors
+from pymongo import UpdateOne
+from pymongo.server_api import ServerApi
+from tqdm import tqdm
+from itertools import islice
+
+import logging
+import datetime
+
+from config.mongodb_config import DB_STRUCTURE
+
+
+
+
+
+"""
+    a cluster contains multiple databases, a database contains multiple collections,
+    a collection contains multiple docs, a doc contains multiple features.
+    """
+
+class MongoConnector:
+    def __init__(self, connection_str):
+        #create a new client and connect to the server
+        self.cluster = MongoClient(host= connection_str, server_api=ServerApi('1'))
+
+        #send a ping to confirm a successful connection
+        try:
+            self.cluster.admin.command('ping')
+            logging.info("MongoConnector: deployment pinged. Successfully connected to MongoDB .")
+        except Exception as e:
+            logging.error(f"MongoConnector: connection failed: {e}")
+            #no need to continue the execution if connection failed
+            raise
+
+        self.db = self.cluster[DB_STRUCTURE['database']]
+        self.collection = self.db[DB_STRUCTURE['collection']]
+
+        logging.info(f"MongoConnector: Cluster: {DB_STRUCTURE['cluster']}.")
+        logging.info(f"MongoConnector: DataBase: {DB_STRUCTURE['database']}.")
+        logging.info(f"MongoConnector: Collection: {DB_STRUCTURE['collection']}.")
+
+        # using 'pmid' to prevent duplicates
+        self.collection.create_index("pmid", unique=True)
+
+    
+    def __enter__(self):
+        return self
+    
+    
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.cluster:
+            self.cluster.close()
+            logging.info("MongoConnector: connection closed.")
+        if exc_type: 
+            logging.exception(f"MongoConnector: unable to close connection, exception: {exc_val}")
+
+
+
+        
+
+
+    def load_articles_to_(self, all_articles: list[dict], bulk_size : int = 10000):
+        """Load fetched articles data to MongoDB  cloud. 
+            Arguments: 
+                    all_articles = list of dictionaries, each corresponds to one article's data.
+                    batch_size = number of articles to load to Mongo per bulk write."""
+        
+        logging.info("MongoConnector: inserting new docs, already present or empty ones are ignored.")
+        batches = list(self._batcher(all_articles, bulk_size))
+
+        with tqdm(total=len(all_articles), desc="Inserting new docs") as pbar:
+            for batch in batches:
+                self._helper_load(batch, pbar)
+                
+
+
+            else: logging.info("MongoConnector: articles inserted successfully to MongoDB .")
+            
+        
+
+
+
+
+    def _helper_load(self, batch: list[dict], pbar: tqdm): 
+        """Loads a batch of articles to MongoDB .
+        Params: 
+                batch: the batch of articles to load
+                pbar: tqdm instance to be updated."""
+        try:
+            operations = []
+            for article in batch:
+                if article.get("abstract"):  # ignore empty abstracts
+                    article["fetchingdate"] = datetime.datetime.now(datetime.timezone.utc)
+                    operations.append(
+                        UpdateOne(
+                            {"pmid": article["pmid"]},
+                            {"$setOnInsert": article},
+                            upsert=True
+                        )
+                    )
+                    pbar.update(1)
+                    pbar.refresh()
+
+            if operations:  # only execute if we have something to insert
+                result = self.collection.bulk_write(operations, ordered=False)
+                logging.info(f"MongoConnector: inserted {result.upserted_count} new docs.")
+
+        except errors.BulkWriteError as e:
+            logging.error(f"MongoConnector: Bulk write error: {e.details}")
+        except errors.PyMongoError as e:
+            logging.error(f"MongoConnector: unable to store batch of articles: {e}")
+
+    def _batcher(self, all_articles: list, batch_size: int):
+            """Create batches of size batch_size of articles list"""
+            iterator = iter(all_articles)
+            while True: 
+                batch = list(islice(iterator, batch_size))
+                if not batch: #meaning the iterator is consumed, which will give an empty batch
+                    break
+                yield batch
+
+
+    
+    def fetch_articles_from_(self, query = {}):
+        """
+        query = {} to fetch all data.
+
+        """
+        articles = []
+        try: 
+            cursor = self.collection.find(query) #it returns a cursor to iterate.
+        except errors.PyMongoError as e: 
+            logging.error(f"MongoConnector: unable to fetch docs: {e}.")
+            raise
+
+        logging.info("MongoConnector: fetching docs from MongoDB .")
+        articles = []
+        with tqdm(total=self.collection.count_documents(query), desc="fetching docs from MongoDB ") as pbar:
+            #cursors are not thread-safe, so no multithreading is possible here
+            for doc in cursor:
+                article = self._helper_fetch(doc, pbar)
+                if article:
+                    articles.append(article)
+
+        logging.info("MongoConnector: articles fetched successfully from MongoDB .")
+        return articles
+    
+
+    def _helper_fetch(self, doc, pbar:tqdm) -> dict:
+        """fetches the provided doc from MongoDB """
+        try:
+            if ('abstract' in doc and  isinstance(doc['abstract'], str)) or ('body' in doc and isinstance(doc['body'], str)):
+                article = {}
+
+                article['pmid'] = doc['pmid'] if 'pmid' in doc else None
+                article['pmcid'] = doc['pmcid'] if 'pmcid' in doc else None 
+                article['fetching_date'] = doc['fetchingdate'] if 'fetchingdate' in doc else None
+                texts = []
+
+                #add abstract and title to text
+                if isinstance(doc.get('abstract'), str):
+                    texts.append(doc['abstract'])
+                if 'title' in doc and isinstance(doc['title'], str): 
+                    texts.append(doc['title'])
+                #add body, it can be missing if we only fetched abstracts.
+                if 'body' in doc and isinstance(doc['body'], str):
+                    texts.append(doc['body']) 
+                #add keywords and MeSH to texts.
+                if 'keywords' in doc:
+                    keywords = [elt for elt in doc['keywords'] if isinstance(elt, str)]
+                    texts.extend(keywords)
+
+                if 'medical_subject_headings' in doc: 
+                    mesh = [elt for elt in doc['medical_subject_headings'] if isinstance(elt, str)]
+                    texts.extend(mesh)
+                
+
+                article['text'] = " ".join(texts)
+                pbar.update(1)
+                pbar.refresh()
+
+                return article
+            
+        except Exception as e: 
+            logging.error(f"MongoConnector: unable to fetch article with PMid {article.get('pmid')}: {e}.")
+            return {}
+        
+
+    def clear_collection(self):
+        """
+        #USE WITH CAUTION, this deletes all documents in the connected MongoDB  collection to start fresh.
+        
+        """
+        try:
+            result = self.collection.delete_many({})  # {} matches all documents
+            logging.info(f"MongoConnector: cleared collection. {result.deleted_count} documents deleted.")
+        except errors.PyMongoError as e:
+            logging.error(f"MongoConnector: failed to clear collection: {e}.")
+            raise
+

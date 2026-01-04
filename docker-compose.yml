@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - "8000:5000"
+    env_file:
+      - ./api/.env
+    networks:
+      - medgraph-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://api:8000
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - medgraph-network
+    depends_on:
+      - api
+
+networks:
+  medgraph-network:
+    driver: bridge
