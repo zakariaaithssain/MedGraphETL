@@ -4,11 +4,11 @@ The frontend provides a visual overview and exploration interface for the medica
 It's **decoupled from the ETL** process and depends only on the API.  
 This frontend is meant to complement the project by providing visibility into the graph, **not to replace Neo4j Browser or Bloom**.  
 ## Tech Stack 
+The frontend is built as a static application and served by Nginx in production. Stack:  
 - TypeScript  
 - Vite-based Setup  
 - HTML/CSS  
 - Nginx (for production serving via Docker)   
-The frontend is built as a static application and served by Nginx in production.
 
 ## Running the Frontend 
 The frontend requires one environment variable: **VITE_API_BASE_URL**; that is the URL for the API service.  
@@ -25,7 +25,7 @@ docker build --build-arg VITE_API_BASE_URL=http://localhost:8000 -t frontend:lat
 #then run the container:  
 docker run -p 8080:80 frontend:latest
 ```
-To run together with the API service using Docker compose:   
+To run together with the API service using Docker Compose:   
 ```bash 
 # from project root run: 
 docker compose up --build 
