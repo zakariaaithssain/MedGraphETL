@@ -81,6 +81,8 @@ Inside the `modules/` folder, we have the following classes:
     - SIMPLE_CHEMICAL
     - TISSUE
 
+    Each node has the following properties: `cui`, `name`, `normalized_name`, and `normalization_source`.
+
     Based on these labels, we recognize the following relations using the `Spacy matchers`:  
     - PRODUCES  
     - CONTAINS  
@@ -105,7 +107,8 @@ Inside the `modules/` folder, we have the following classes:
     - SECRETED_BY  
     - TREATS  
 
- 
+    Each relation has a `pmcid` property referring to the PubMedCentral ID of the article from which it was extracted, enabeling **backward verification**.  
+    We excluded this property from nodes because including it would cause unnecessary duplication, and because nodes backward verification is only meaningful within the context of a relationship. 
 
 
 ## Running ETL Service  
