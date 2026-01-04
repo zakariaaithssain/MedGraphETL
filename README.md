@@ -112,7 +112,9 @@ docker compose up --build
 <p align="center">
 <img src="imgs/medgraph.png" width="700"/>
 <img src="imgs/front.png" width="700"/>
-<img src="imgs/nodes.png" width="700"/>
+<img src="imgs/nodes_page.png" width="700"/>
 <img src="imgs/relations.png" width="700"/>
+
+
 </p>
 
