@@ -12,6 +12,6 @@ RUN pip install uv
 RUN uv pip install --no-cache-dir --system -r requirements.txt
 
 COPY . .
-
+EXPOSE 8000
 ENTRYPOINT ["uvicorn", "main:app"]
-CMD ["--host", "0.0.0.0", "--port", "5000"]
+CMD ["--host", "0.0.0.0", "--port", "8000"]

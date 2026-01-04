@@ -41,7 +41,7 @@ You can either run the API as a **standalone container**:
 docker build -t api:latest . 
 
 #run the container
-docker run --env-file .env -p 8000:5000 api  
+docker run --env-file .env -p 8000:8000 api  
 
 #the API will be available at http://localhost:8000
 ```
